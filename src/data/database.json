@@ -7,12 +7,12 @@
       "name": "John Doe",
       "classroom": "101",
       "inventory": [
-        { "id": 1, "title": "Apple", "image": "apple.jpg" }
+        { "id": 1, "title": "Apple", "image": "vbof.png" }
       ]
     }
   },
   "foodListings": [
-    { "id": 1, "title": "Pizza", "image": "pizza.jpg", "seller": "user1" },
-    { "id": 2, "title": "Burger", "image": "burger.jpg", "seller": "user2" }
+    { "id": 1, "title": "Pizza", "image": "vbof.png", "seller": "user1" },
+    { "id": 2, "title": "Burger", "image": "vbof.png", "seller": "user2" }
   ]
 }
