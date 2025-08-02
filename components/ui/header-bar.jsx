@@ -1,17 +1,32 @@
 import { Input } from "/components/ui/input"
 import { Button } from "/components/ui/button"
-import { House, MessageCircle, Search } from "lucide-react"
+import { CircleUserRound, House, MessageCircle, Search } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useLocation } from "react-router-dom";
+
 
 export function HeaderBar() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   return (
     <div className="w-full flex items-center justify-between bg-[#C5BAFF] px-4 py-3 space-x-2">
-      {/* Left icon */}
-      <Link to="/">
-        <div className="rounded-xl p-2 hover:bg-gray-100 transition">
-          <House className="h-5 w-5 text-gray-500" />
-        </div>
-      </Link>
+      
+      {isHome ? (
+        // Show Profile icon on Home
+        <Link to="/profile">
+          <div className="rounded-xl p-2 hover:bg-white transition">
+            <CircleUserRound className="h-7 w-7 text-white" />
+          </div>
+        </Link>
+      ) : (
+        // Show Home icon on other pages
+        <Link to="/">
+          <div className="rounded-xl p-2 hover:bg-white transition">
+            <House className="h-7 w-7 text-white" />
+          </div>
+        </Link>
+      )}
+
 
       {/* Search bar */}
       <div className="relative flex-1 bg-white rounded-md">
@@ -25,8 +40,8 @@ export function HeaderBar() {
 
       {/* Right icon */}
       <Link to="/chats">
-        <div className="rounded-xl p-2 hover:bg-gray-100 transition">
-          <MessageCircle className="h-5 w-5 text-gray-500" />
+        <div className="rounded-xl p-2 hover:bg-white transition">
+          <MessageCircle className="h-7 w-7 text-white" />
         </div>
       </Link>
     </div>
