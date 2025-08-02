@@ -332,7 +332,7 @@ function AddFood() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex items-center justify-center bg-black" style={{ height: 'calc(100vh - 4rem)' }}>
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Starting camera...</p>
@@ -343,7 +343,7 @@ function AddFood() {
 
   if (cameraError) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white p-4">
+      <div className="flex items-center justify-center bg-black text-white p-4" style={{ height: 'calc(100vh - 4rem)' }}>
         <div className="text-center">
           <p className="mb-4">{cameraError}</p>
           <div className="space-y-3">
@@ -388,7 +388,7 @@ function AddFood() {
   }
 
   return (
-    <div className="relative min-h-screen bg-black">
+    <div className="relative bg-black" style={{ height: 'calc(100vh - 4rem)' }}>
       {/* Processing/Loading Screen */}
       {isProcessing && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
@@ -405,7 +405,7 @@ function AddFood() {
 
       {/* Individual Cropped Portion View */}
       {showCroppedView && croppedPortions.length > 0 && (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="bg-white flex flex-col" style={{ height: 'calc(100vh - 4rem)' }}>
           {/* Header */}
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
@@ -498,7 +498,7 @@ function AddFood() {
 
       {/* Camera View - Only show if not processing and not showing cropped view */}
       {!isProcessing && !showCroppedView && !capturedImage && (
-        <div className="relative w-full h-screen">
+        <div className="relative w-full" style={{ height: 'calc(100vh - 4rem)' }}>
           <video
             ref={videoRef}
             autoPlay
@@ -541,7 +541,7 @@ function AddFood() {
 
       {/* Photo Preview - Only show if not processing and not showing cropped view */}
       {!isProcessing && !showCroppedView && capturedImage && (
-        <div className="relative w-full h-screen">
+        <div className="relative w-full" style={{ height: 'calc(100vh - 4rem)' }}>
           <img
             src={capturedImage.url}
             alt="Captured food"
