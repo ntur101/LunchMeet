@@ -9,7 +9,7 @@ import { HeaderBar } from '/components/ui/header-bar';
 
 function AppContent() {
   const location = useLocation();
-  const showHeader = location.pathname !== '/login';
+  const showHeader = location.pathname !== '/login' && !location.pathname.startsWith('/food/');
 
   return (
     <div className="min-h-screen w-full max-w-md mx-auto bg-white text-black">
