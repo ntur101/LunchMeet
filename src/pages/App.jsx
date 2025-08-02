@@ -1,17 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './Login';
-import Dashboard from './Dashboard';
+import Home from './Home';
 import Profile from './Profile';
 import AddFood from './AddFood';
 import FoodDetail from './FoodDetail';
 import Chat from './Chat';
-import Navbar from '../components/Navbar';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen w-full max-w-md mx-auto bg-white text-black">
-        <Navbar />
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
