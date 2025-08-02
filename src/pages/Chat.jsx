@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HeaderBar } from '../../components/ui/header-bar';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { X } from 'lucide-react';
@@ -40,6 +39,7 @@ function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const [responseIndex, setResponseIndex] = useState(0); // Track which response to use next
   const [isTyping, setIsTyping] = useState(false); // Track if Sarah is typing
+  const [isVisible, setIsVisible] = useState(false); // For slide animation
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -49,6 +49,11 @@ function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Trigger slide-up animation when component mounts
+    setIsVisible(true);
+  }, []);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -101,9 +106,9 @@ function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <HeaderBar />
-      
+    <div className={`flex flex-col h-screen transform transition-transform duration-300 ease-out ${
+      isVisible ? 'translate-y-0' : 'translate-y-full'
+    }`}>
       {/* Chat Header */}
       <div className="bg-white border-b p-4 shadow-sm">
         <div className="flex justify-between items-center">

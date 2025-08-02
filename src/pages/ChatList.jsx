@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { HeaderBar } from '../../components/ui/header-bar';
 
 const mockChats = [
   { chatId: "sarah-m", name: "Sarah M.", lastMessage: "Sounds good! See you there", timestamp: "10:40 AM" },
@@ -10,11 +9,9 @@ const mockChats = [
 
 function ChatList() {
   return (
-    <div>
-      <HeaderBar />
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Chats</h2>
-        {mockChats.map((chat) => (
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Chats</h2>
+      {mockChats.map((chat) => (
           <Link
             to={`/chat/${chat.chatId}`}
             key={chat.chatId}
@@ -29,7 +26,6 @@ function ChatList() {
             </div>
           </Link>
         ))}
-      </div>
     </div>
   );
 }
