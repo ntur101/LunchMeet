@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Camera, RotateCcw, Check, X, Loader2, Plus, SkipForward } from 'lucide-react';
 
 function AddFood() {
+  const navigate = useNavigate();
   const [stream, setStream] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
@@ -14,21 +16,15 @@ function AddFood() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  // Start camera when component mounts
   useEffect(() => {
-    console.log('AddFood component mounted, starting camera...');
     startCamera();
     return () => {
-      // Cleanup camera stream when component unmounts
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-      
-      // Cleanup image URLs when component unmounts
       if (capturedImage?.url) {
         URL.revokeObjectURL(capturedImage.url);
       }
-      
       croppedPortions.forEach(portion => {
         if (portion.image && portion.image.startsWith('blob:')) {
           URL.revokeObjectURL(portion.image);
@@ -37,47 +33,29 @@ function AddFood() {
     };
   }, []);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('AddFood state:', {
-      isLoading,
-      cameraError,
-      isProcessing,
-      showCroppedView,
-      currentPortionIndex,
-      totalPortions: croppedPortions.length,
-      hasStream: !!stream,
-      hasCapturedImage: !!capturedImage
-    });
-  }, [isLoading, cameraError, isProcessing, showCroppedView, currentPortionIndex, croppedPortions.length, stream, capturedImage]);
-
   const startCamera = async () => {
     try {
       setIsLoading(true);
       setCameraError(null);
-      
-      // Check if getUserMedia is supported
+
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera API not supported in this browser');
       }
-      
-      // Request access to the camera with landscape constraints for food photography
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // Use back camera on mobile
+          facingMode: 'environment',
           width: { ideal: 1920, min: 1280 },
           height: { ideal: 1080, min: 720 },
-          aspectRatio: { ideal: 16/9 } // Landscape aspect ratio
+          aspectRatio: { ideal: 16 / 9 }
         }
       });
-      
+
       setStream(mediaStream);
-      
-      // Set the video source to the stream
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
-      
+
       setIsLoading(false);
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -91,19 +69,15 @@ function AddFood() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
-      
-      // Get the video's actual dimensions
+
       const videoWidth = video.videoWidth;
       const videoHeight = video.videoHeight;
-      
-      // Set canvas dimensions to match video exactly as displayed
+
       canvas.width = videoWidth;
       canvas.height = videoHeight;
-      
-      // Draw the video frame to canvas exactly as it appears in the viewfinder
+
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      // Convert canvas to blob/base64
+
       canvas.toBlob((blob) => {
         const imageUrl = URL.createObjectURL(blob);
         setCapturedImage({
@@ -125,14 +99,12 @@ function AddFood() {
 
   const confirmPhoto = async () => {
     setIsProcessing(true);
-    
-    // Stop the camera stream
+
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
-    
-    // Simulate AI processing and food detection
+
     try {
       const croppedItems = await simulateFoodDetection(capturedImage);
       setCroppedPortions(croppedItems);
@@ -146,43 +118,34 @@ function AddFood() {
   };
 
   const simulateFoodDetection = async (image) => {
-    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Log image dimensions for debugging
-    console.log('Captured image dimensions:', {
-      width: image.width,
-      height: image.height
-    });
-    
-    // Generate mock cropped portions with bounding boxes for landscape images
-    // Using percentages and then converting to actual pixels
+
     const imageWidth = image.width || 1920;
     const imageHeight = image.height || 1080;
-    
+
     const mockCroppedPortions = [
       {
         id: 1,
         name: "Sandwich",
         confidence: 0.92,
         image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.0), // 10% from left
-          y: Math.floor(imageHeight * 0.16), // 20% from top
-          width: Math.floor(imageWidth * 0.7), // 35% of width
-          height: Math.floor(imageHeight * 0.7) // 60% of height
+        boundingBox: {
+          x: Math.floor(imageWidth * 0.0),
+          y: Math.floor(imageHeight * 0.16),
+          width: Math.floor(imageWidth * 0.7),
+          height: Math.floor(imageHeight * 0.7)
         }
       },
       {
         id: 2,
-        name: "Apple", 
+        name: "Apple",
         confidence: 0.87,
         image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.4), // 10% from left
-          y: Math.floor(imageHeight * 0.10), // 20% from top
-          width: Math.floor(imageWidth * 0.45), // 35% of width
-          height: Math.floor(imageHeight * 0.45) // 60% of height
+        boundingBox: {
+          x: Math.floor(imageWidth * 0.4),
+          y: Math.floor(imageHeight * 0.10),
+          width: Math.floor(imageWidth * 0.45),
+          height: Math.floor(imageHeight * 0.45)
         }
       },
       {
@@ -190,31 +153,32 @@ function AddFood() {
         name: "Chips",
         confidence: 0.78,
         image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.4), // 10% from left
-          y: Math.floor(imageHeight * 0.45), // 20% from top
-          width: Math.floor(imageWidth * 0.45), // 35% of width
-          height: Math.floor(imageHeight * 0.45) // 60% of height
+        boundingBox: {
+          x: Math.floor(imageWidth * 0.4),
+          y: Math.floor(imageHeight * 0.45),
+          width: Math.floor(imageWidth * 0.45),
+          height: Math.floor(imageHeight * 0.45)
         }
       }
     ];
-    
-    console.log('Generated bounding boxes:', mockCroppedPortions.map(p => ({
-      name: p.name,
-      boundingBox: p.boundingBox
-    })));
-    
-    // Create cropped images for each portion
+
     const croppedPortions = await Promise.all(
       mockCroppedPortions.map(async (portion) => {
-        const croppedImageUrl = await cropImage(image.url, portion.boundingBox);
+        const croppedBase64 = await cropImage(image.url, portion.boundingBox);
+
+        try {
+          localStorage.setItem(`food-image-${portion.id}`, croppedBase64);
+        } catch (e) {
+          console.error('Error saving to localStorage:', e);
+        }
+
         return {
           ...portion,
-          image: croppedImageUrl
+          image: croppedBase64
         };
       })
     );
-    
+
     return croppedPortions;
   };
 
@@ -222,81 +186,107 @@ function AddFood() {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      
+
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
-        // Set canvas size to the bounding box dimensions
+
         canvas.width = boundingBox.width;
         canvas.height = boundingBox.height;
-        
-        // Draw the cropped portion of the image
+
         ctx.drawImage(
           img,
-          boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, // Source rectangle
-          0, 0, boundingBox.width, boundingBox.height // Destination rectangle
+          boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height,
+          0, 0, boundingBox.width, boundingBox.height
         );
-        
-        // Convert canvas to blob URL
-        canvas.toBlob((blob) => {
-          const croppedUrl = URL.createObjectURL(blob);
-          resolve(croppedUrl);
-        }, 'image/jpeg', 0.8);
+
+        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(base64);
       };
-      
+
       img.src = imageUrl;
     });
   };
 
   const addFoodItem = (item) => {
-    console.log('Adding food item:', item);
-    setAddedItems(prev => [...prev, item]);
-    goToNextPortion();
+    const newAddedItems = [...addedItems, item];
+    setAddedItems(newAddedItems);
+    
+    if (currentPortionIndex < croppedPortions.length - 1) {
+      setCurrentPortionIndex(prev => prev + 1);
+    } else {
+      // This is the last item, finish with the updated count
+      finishAddingWithItems(newAddedItems);
+    }
   };
 
   const skipFoodItem = () => {
-    console.log('Skipping food item');
-    goToNextPortion();
+    if (currentPortionIndex < croppedPortions.length - 1) {
+      setCurrentPortionIndex(prev => prev + 1);
+    } else {
+      finishAdding();
+    }
   };
 
   const goToNextPortion = () => {
     if (currentPortionIndex < croppedPortions.length - 1) {
       setCurrentPortionIndex(prev => prev + 1);
     } else {
-      // Finished with all portions
       finishAdding();
     }
   };
 
+  const finishAddingWithItems = (itemsArray) => {
+    const totalDetected = croppedPortions.length;
+    const totalAdded = itemsArray.length;
+    const skipped = totalDetected - totalAdded;
+    
+    let message = `Added ${totalAdded} food item${totalAdded !== 1 ? 's' : ''}`;
+    if (totalAdded > 0) {
+      message += `: ${itemsArray.map(item => item.name).join(', ')}`;
+    }
+    if (skipped > 0) {
+      message += `\nSkipped ${skipped} item${skipped !== 1 ? 's' : ''}`;
+    }
+    
+    alert(message);
+    navigate('/'); // Redirect to main page
+  };
+
   const finishAdding = () => {
-    console.log('Finished adding food items:', addedItems);
-    // Here you would typically save to database or navigate somewhere
-    alert(`Added ${addedItems.length} food items: ${addedItems.map(item => item.name).join(', ')}`);
-    startOver();
+    const totalDetected = croppedPortions.length;
+    const totalAdded = addedItems.length;
+    const skipped = totalDetected - totalAdded;
+    
+    let message = `Added ${totalAdded} food item${totalAdded !== 1 ? 's' : ''}`;
+    if (totalAdded > 0) {
+      message += `: ${addedItems.map(item => item.name).join(', ')}`;
+    }
+    if (skipped > 0) {
+      message += `\nSkipped ${skipped} item${skipped !== 1 ? 's' : ''}`;
+    }
+    
+    alert(message);
+    navigate('/'); // Redirect to main page
   };
 
   const startOver = () => {
-    // Clean up cropped image URLs to prevent memory leaks
     croppedPortions.forEach(portion => {
       if (portion.image && portion.image.startsWith('blob:')) {
         URL.revokeObjectURL(portion.image);
       }
     });
-    
-    // Clean up captured image URL
+
     if (capturedImage?.url) {
       URL.revokeObjectURL(capturedImage.url);
     }
-    
-    // Reset all states
+
     setCapturedImage(null);
     setCroppedPortions([]);
     setShowCroppedView(false);
     setCurrentPortionIndex(0);
     setAddedItems([]);
     setIsProcessing(false);
-    // Restart camera
     startCamera();
   };
 
@@ -304,88 +294,29 @@ function AddFood() {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
     }
-    
+
     try {
-      // Try to switch between front and back camera
       const currentFacingMode = stream?.getVideoTracks()[0]?.getSettings()?.facingMode;
       const newFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-      
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: newFacingMode,
           width: { ideal: 1920, min: 1280 },
           height: { ideal: 1080, min: 720 },
-          aspectRatio: { ideal: 16/9 } // Landscape aspect ratio
+          aspectRatio: { ideal: 16 / 9 }
         }
       });
-      
+
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
     } catch (error) {
       console.error('Error switching camera:', error);
-      // If switching fails, restart with default camera
       startCamera();
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center bg-black" style={{ height: 'calc(100vh - 60px)' }}>
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Starting camera...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (cameraError) {
-    return (
-      <div className="flex items-center justify-center bg-black text-white p-4" style={{ height: 'calc(100vh - 60px)' }}>
-        <div className="text-center">
-          <p className="mb-4">{cameraError}</p>
-          <div className="space-y-3">
-            <button 
-              onClick={startCamera}
-              className="block w-full bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded"
-            >
-              Try Again
-            </button>
-            <button 
-              onClick={() => {
-                // Skip camera and go directly to demo mode
-                setCameraError(null);
-                setIsLoading(false);
-                setShowCroppedView(true);
-                setCurrentPortionIndex(0);
-                setCroppedPortions([
-                  {
-                    id: 1,
-                    name: "Demo Sandwich",
-                    confidence: 0.92,
-                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZvb2QgSW1hZ2U8L3RleHQ+PC9zdmc+",
-                    boundingBox: { x: 0, y: 30, width: 150, height: 200 }
-                  },
-                  {
-                    id: 2,
-                    name: "Demo Apple",
-                    confidence: 0.87,
-                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFwcGxlPC90ZXh0Pjwvc3ZnPg==",
-                    boundingBox: { x: 300, y: 100, width: 120, height: 120 }
-                  }
-                ]);
-              }}
-              className="block w-full bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
-            >
-              Skip Camera (Demo Mode)
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="relative bg-black" style={{ height: 'calc(100vh - 60px)' }}>
