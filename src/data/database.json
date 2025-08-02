@@ -1,0 +1,18 @@
+{
+  "users": [
+    { "username": "user1", "password": "password1" }
+  ],
+  "profiles": {
+    "user1": {
+      "name": "John Doe",
+      "classroom": "101",
+      "inventory": [
+        { "id": 1, "title": "Apple", "image": "apple.jpg" }
+      ]
+    }
+  },
+  "foodListings": [
+    { "id": 1, "title": "Pizza", "image": "pizza.jpg", "seller": "user1" },
+    { "id": 2, "title": "Burger", "image": "burger.jpg", "seller": "user2" }
+  ]
+}
