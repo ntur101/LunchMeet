@@ -117,15 +117,35 @@ function AddFood() {
     }
   };
 
+  const getNextFoodId = () => {
+    let nextId = 1;
+    
+    // Check localStorage to find the highest existing food-image ID
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('food-image-')) {
+        const id = parseInt(key.replace('food-image-', ''));
+        if (id >= nextId) {
+          nextId = id + 1;
+        }
+      }
+    }
+    
+    return nextId;
+  };
+
   const simulateFoodDetection = async (image) => {
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     const imageWidth = image.width || 1920;
     const imageHeight = image.height || 1080;
+    
+    // Get the starting ID for this batch of detected foods
+    let currentId = getNextFoodId();
 
     const mockCroppedPortions = [
       {
-        id: 1,
+        id: currentId++,
         name: "Sandwich",
         confidence: 0.92,
         image: image.url,
@@ -137,7 +157,7 @@ function AddFood() {
         }
       },
       {
-        id: 2,
+        id: currentId++,
         name: "Apple",
         confidence: 0.87,
         image: image.url,
@@ -149,7 +169,7 @@ function AddFood() {
         }
       },
       {
-        id: 3,
+        id: currentId++,
         name: "Chips",
         confidence: 0.78,
         image: image.url,
@@ -168,6 +188,8 @@ function AddFood() {
 
         try {
           localStorage.setItem(`food-image-${portion.id}`, croppedBase64);
+          // Also store the food name for the Profile component to use
+          localStorage.setItem(`food-name-${portion.id}`, portion.name);
         } catch (e) {
           console.error('Error saving to localStorage:', e);
         }
