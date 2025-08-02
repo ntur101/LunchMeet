@@ -48,14 +48,14 @@ function Home() {
             <p className="text-sm text-gray-400 mt-1">Try searching with different keywords</p>
           </div>
         ) : (
-          listings.map((item) => (
-            <FoodCard
-              key={item.id}
-              imageSrc={`/src/assets/${item.image}`}
-              label={item.title}
-            />
-          ))
-        )}
+        listings.map((item) => (
+          <FoodCard
+            key={item.id}
+            id={item.id}
+            imageSrc={`/src/assets/${item.image}`}
+            label={item.title}
+          />
+        )))}
       </div>
 
       {/* Floating Add Button */}
