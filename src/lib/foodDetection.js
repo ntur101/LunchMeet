@@ -25,28 +25,60 @@ export const detectFood = async (blob) => {
       }
     );
 
-    console.log("AI Detection Response:", response.data);
+    console.log("AI Detection Response (full):", response.data);
     
-    // Filter for items with high confidence (any object, not just food)
+    // Check if the model is still loading
+    if (response.data.error && response.data.error.includes('loading')) {
+      console.log("Model is still loading, will retry...");
+      return 'Item (Model Loading)';
+    }
+    
+    // Sort all detections by confidence first to see what we're getting
+    const allDetections = response.data
+      .sort((a, b) => b.score - a.score);
+    
+    console.log("All detections sorted by confidence:", allDetections);
+    
+    // Lower confidence threshold to 0.3 to see more results
     const detectedItems = response.data
-      .filter(item => item.score > 0.5) // Only keep predictions with >50% confidence
-      .sort((a, b) => b.score - a.score); // Sort by confidence, highest first
+      .filter(item => item.score > 0.3) // Lowered from 0.5 to 0.3
+      .sort((a, b) => b.score - a.score);
+
+    console.log("High confidence detections (>0.3):", detectedItems);
 
     // Return the highest confidence item or fallback
     if (detectedItems.length > 0) {
-      return detectedItems[0].label;
+      const bestDetection = detectedItems[0];
+      console.log(`Returning: ${bestDetection.label} (confidence: ${bestDetection.score.toFixed(3)})`);
+      return bestDetection.label;
     } else {
       // If no high-confidence items, return the best available or fallback
       const highestConfidence = response.data
         .sort((a, b) => b.score - a.score)[0];
       
-      return highestConfidence ? highestConfidence.label : 'Item';
+      if (highestConfidence) {
+        console.log(`Fallback detection: ${highestConfidence.label} (confidence: ${highestConfidence.score.toFixed(3)})`);
+        return highestConfidence.label;
+      } else {
+        console.log("No detections found, using fallback");
+        return 'Item';
+      }
     }
     
   } catch (error) {
     console.error('Error detecting item:', error);
     
-    // If API fails, return a generic name
+    // If the main model fails, try a backup approach
+    if (error.response) {
+      console.log('API Error Response:', error.response.data);
+      
+      // If it's a model loading error, indicate that
+      if (error.response.data?.error?.includes('loading')) {
+        return 'Item (Model Loading)';
+      }
+    }
+    
+    // If API fails completely, return a generic name
     return 'Item';
   }
 };
