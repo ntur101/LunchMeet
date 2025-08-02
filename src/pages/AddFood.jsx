@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Camera, RotateCcw, Check, X, Loader2, Plus, SkipForward } from 'lucide-react';
+import { addFoodItem as saveFoodItemToDatabase, getUserProfile } from '../lib/api.js';
 
 function AddFood() {
   const [stream, setStream] = useState(null);
@@ -13,6 +14,23 @@ function AddFood() {
   const [addedItems, setAddedItems] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  // For now, using a default user. In a real app, this would come from authentication context
+  const currentUser = 'user1';
+
+  // Utility function to convert blob to base64
+  const blobToBase64 = (blob) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  // Utility function to generate unique IDs
+  const generateId = () => {
+    return Date.now() + Math.random().toString(36).substr(2, 9);
+  };
 
   // Start camera when component mounts
   useEffect(() => {
@@ -249,9 +267,54 @@ function AddFood() {
     });
   };
 
-  const addFoodItem = (item) => {
+  const addFoodItem = async (item) => {
     console.log('Adding food item:', item);
-    setAddedItems(prev => [...prev, item]);
+    
+    try {
+      // Convert the image blob to base64 for storage
+      let imageData = item.image;
+      if (item.image && item.image.startsWith('blob:')) {
+        console.log('Converting blob image to base64...');
+        // Fetch the blob and convert to base64
+        const response = await fetch(item.image);
+        const blob = await response.blob();
+        imageData = await blobToBase64(blob);
+        console.log('Image converted to base64, size:', imageData.length, 'characters');
+      }
+      
+      // Create the food item object to save
+      const foodItemToSave = {
+        id: generateId(),
+        title: item.name,
+        image: imageData,
+        confidence: item.confidence,
+        dateAdded: new Date().toISOString(),
+        source: 'camera_capture'
+      };
+      
+      console.log('Saving food item to database:', foodItemToSave.title);
+      
+      // Add to local state
+      setAddedItems(prev => [...prev, foodItemToSave]);
+      
+      // Save to database using the imported API function
+      saveFoodItemToDatabase(currentUser, foodItemToSave);
+      
+      console.log('Successfully saved food item to database:', foodItemToSave.title);
+      
+    } catch (error) {
+      console.error('Error saving food item:', error);
+      // Still add to local state even if database save fails
+      setAddedItems(prev => [...prev, {
+        id: generateId(),
+        title: item.name,
+        image: item.image,
+        confidence: item.confidence,
+        dateAdded: new Date().toISOString(),
+        source: 'camera_capture'
+      }]);
+    }
+    
     goToNextPortion();
   };
 
@@ -271,8 +334,18 @@ function AddFood() {
 
   const finishAdding = () => {
     console.log('Finished adding food items:', addedItems);
-    // Here you would typically save to database or navigate somewhere
-    alert(`Added ${addedItems.length} food items: ${addedItems.map(item => item.name).join(', ')}`);
+    
+    if (addedItems.length > 0) {
+      const itemNames = addedItems.map(item => item.title).join(', ');
+      
+      // Show current database state in console
+      console.log('Current user inventory:', getUserProfile(currentUser)?.inventory);
+      
+      alert(`Successfully added ${addedItems.length} food item${addedItems.length !== 1 ? 's' : ''} to your inventory: ${itemNames}\n\nCheck the browser console to see the updated database state.`);
+    } else {
+      alert('No items were added to your inventory.');
+    }
+    
     startOver();
   };
 
