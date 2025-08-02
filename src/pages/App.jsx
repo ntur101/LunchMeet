@@ -11,8 +11,7 @@ function App() {
     <Router>
       <div className="min-h-screen w-full max-w-md mx-auto bg-white text-black">
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/add" element={<AddFood />} />
           <Route path="/food/:id" element={<FoodDetail />} />
