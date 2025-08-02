@@ -212,6 +212,30 @@ function AddFood() {
     return nextId;
   };
 
+  const retakeLastPhoto = () => {
+    if (savedPhotos.length > 0) {
+      const lastPhoto = savedPhotos[savedPhotos.length - 1];
+      
+      // Remove the last photo from localStorage
+      localStorage.removeItem(`food-image-${lastPhoto.id}`);
+      localStorage.removeItem(`food-name-${lastPhoto.id}`);
+      
+      // Clean up the blob URL
+      if (lastPhoto.url && lastPhoto.url.startsWith('blob:')) {
+        URL.revokeObjectURL(lastPhoto.url);
+      }
+      
+      // Remove from savedPhotos array
+      setSavedPhotos(prev => prev.slice(0, -1));
+      
+      // Reset states and go back to camera
+      setShowSavedConfirmation(false);
+      setDetectedFoodName('');
+      
+      // Camera should already be running in the background
+    }
+  };
+
   const takeAnotherPhoto = async () => {
     setIsRestartingCamera(true);
     setShowSavedConfirmation(false);
@@ -374,6 +398,19 @@ function AddFood() {
           {/* Saved Photo Display */}
           <div className="flex-1 flex items-center justify-center p-6 bg-gray-50">
             <div className="w-full max-w-sm text-center">
+              {/* Photo Preview */}
+              {savedPhotos.length > 0 && savedPhotos[savedPhotos.length - 1] && (
+                <div className="mb-6">
+                  <div className="relative w-full aspect-[7/4] rounded-lg overflow-hidden shadow-lg">
+                    <img
+                      src={savedPhotos[savedPhotos.length - 1].url}
+                      alt={detectedFoodName}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+              
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check className="w-10 h-10 text-green-600" />
               </div>
@@ -394,25 +431,35 @@ function AddFood() {
           </div>
 
           {/* Action Buttons */}
-          <div className="bg-white border-t border-gray-200 p-6">
-            <div className="flex gap-4">
-              {/* Finish Button */}
+          <div className="bg-white border-t border-gray-200 p-4">
+            <div className="space-y-3">
+              {/* Top row - Retake button (full width) */}
               <button
-                onClick={finishAdding}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
+                onClick={retakeLastPhoto}
+                className="w-full bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
-                <Check className="w-5 h-5" />
-                View Inventory ({savedPhotos.length} photo{savedPhotos.length !== 1 ? 's' : ''})
+                <X className="w-4 h-4" />
+                Retake Photo
               </button>
               
-              {/* Take Another Button */}
-              <button
-                onClick={takeAnotherPhoto}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                Take Another
-              </button>
+              {/* Bottom row - View Inventory and Take Another */}
+              <div className="flex gap-3">
+                <button
+                  onClick={finishAdding}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-3 rounded-xl transition-colors flex items-center justify-center gap-1"
+                >
+                  <Check className="w-4 h-4" />
+                  <span className="text-sm">View ({savedPhotos.length})</span>
+                </button>
+                
+                <button
+                  onClick={takeAnotherPhoto}
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-3 rounded-xl transition-colors flex items-center justify-center gap-1"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Take Another</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
