@@ -9,20 +9,20 @@ export function HeaderBar() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   return (
-    <div className="w-full flex items-center justify-between bg-[#C5BAFF] px-4 py-3 space-x-2">
+    <div className="w-full flex items-center justify-between px-4 py-3 space-x-2">
       
       {isHome ? (
         // Show Profile icon on Home
         <Link to="/profile">
           <div className="rounded-xl p-2 hover:bg-white transition">
-            <CircleUserRound className="h-7 w-7 text-white" />
+            <CircleUserRound className="h-7 w-7 " />
           </div>
         </Link>
       ) : (
         // Show Home icon on other pages
         <Link to="/">
           <div className="rounded-xl p-2 hover:bg-white transition">
-            <House className="h-7 w-7 text-white" />
+            <House className="h-7 w-7 " />
           </div>
         </Link>
       )}
@@ -41,7 +41,7 @@ export function HeaderBar() {
       {/* Right icon */}
       <Link to="/chats">
         <div className="rounded-xl p-2 hover:bg-white transition">
-          <MessageCircle className="h-7 w-7 text-white" />
+          <MessageCircle className="h-7 w-7 " />
         </div>
       </Link>
     </div>
