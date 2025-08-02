@@ -18,6 +18,7 @@ function Home() {
         {listings.map((item) => (
           <FoodCard
             key={item.id}
+            id={item.id}
             imageSrc={`/src/assets/${item.image}`}
             label={item.title}
           />

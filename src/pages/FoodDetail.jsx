@@ -1,11 +1,22 @@
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getFoodDetails } from "../lib/api"; // or adjust path if needed
+
 import appleImage from '../assets/red_apple.jpeg';
 import orangeJuiceImage from '../assets/orange_juice.webp';
 import upAndGoImage from '../assets/Up_and_Go.jpeg';
-import { useState } from 'react';
 
 function FoodDetail() {
+  const { id } = useParams(); // pulls the "id" from the URL
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [foodItem, setFoodItem] = useState(null);
+
+  useEffect(() => {
+    const data = getFoodDetails(parseInt(id)); // look up by ID
+    setFoodItem(data);
+  }, [id]);
+
 
   // Mock user's items for the trade selection
   const userItems = [
@@ -50,27 +61,23 @@ function FoodDetail() {
     return index !== -1 ? index + 1 : null;
   };
 
+  if (!foodItem) return <div className="p-4">Loading...</div>;
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Main Content */}
       <div className="flex-1 px-4 py-6">
+        
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-center mb-6">{foodItem.title}</h2>
+        
         {/* Apple Image */}
         <div className="flex justify-center mb-6">
           <img 
-            src={appleImage}
-            alt="Red Apple" 
+            src={`/src/assets/${foodItem.image}`}
+            alt={foodItem.title}
             className="w-80 h-80 object-cover rounded-lg shadow-lg"
           />
-        </div>
-
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-center mb-6">Red Apple</h2>
-
-        {/* Details Section */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-3">Details:</h3>
-          <p className="text-gray-700 mb-2">It's Fresh As Trust Its From New World</p>
-          <p className="text-gray-700">And My Mum Got This From Mart Yesterday</p>
         </div>
 
         {/* User Is Also Trading Section */}
