@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getUserProfile, editFoodItem, deleteFoodItem } from '../lib/api';
 import { Button } from "/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
@@ -9,6 +9,38 @@ function Profile() {
   const [profile, setProfile] = useState(getUserProfile('user1'));
   const [selectedItem, setSelectedItem] = useState(null);
   const [dialogType, setDialogType] = useState(null); // 'edit' or 'delete'
+  const [foodImages, setFoodImages] = useState({});
+
+  // Load images from localStorage on component mount
+  useEffect(() => {
+    const loadImagesFromStorage = () => {
+      const images = {};
+      // Check localStorage for food images (saved from AddFood component)
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('food-image-')) {
+          const foodId = key.replace('food-image-', '');
+          const imageData = localStorage.getItem(key);
+          if (imageData) {
+            images[foodId] = imageData;
+          }
+        }
+      }
+      setFoodImages(images);
+    };
+
+    loadImagesFromStorage();
+  }, []);
+
+  // Helper function to get image source for an item
+  const getImageSource = (item) => {
+    // First try to get from localStorage (from AddFood)
+    if (foodImages[item.id]) {
+      return foodImages[item.id];
+    }
+    // Fallback to the original image path
+    return `/src/assets/${item.image}`;
+  };
 
   const openDialog = (type, item) => {
     setSelectedItem(item);
@@ -50,8 +82,8 @@ function Profile() {
               <CardHeader className="relative p-0">
                 <div className="relative w-full aspect-[3/4]">
                   <img
-                    src={`/src/assets/${item.image}`}
-                    alt=""
+                    src={getImageSource(item)}
+                    alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover rounded-t-md"
                   />
                   <div className="absolute top-2 right-2 flex gap-2 z-10">
