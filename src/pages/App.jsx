@@ -16,6 +16,7 @@ function App() {
           <Route path="/add" element={<AddFood />} />
           <Route path="/food/:id" element={<FoodDetail />} />
           <Route path="/chat/:chatId" element={<Chat />} />
+          <Route path="/chats" element={<ChatList />} />
         </Routes>
       </div>
     </Router>
