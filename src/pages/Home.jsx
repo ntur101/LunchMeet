@@ -1,9 +1,8 @@
-import { Input } from "/components/ui/input"
+import { HeaderBar } from "/components/ui/header-bar"
 
 function Home() {
-  return <div className="p-4">
-    Dashboard Page - List of food items
-    <Input type="" placeholder="Search for Food" className="bg-black"/>
+  return <div className="">
+    <HeaderBar />
     </div>;
 }
 export default Home;
