@@ -16,6 +16,7 @@ function AppContent() {
       {showHeader && <HeaderBar />}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/add" element={<AddFood />} />
         <Route path="/food/:id" element={<FoodDetail />} />
