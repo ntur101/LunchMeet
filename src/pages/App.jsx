@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './LoginPage';
-import DashboardPage from './DashboardPage';
-import ProfilePage from './ProfilePage';
-import AddFoodPage from './AddFoodPage';
-import FoodDetailPage from './FoodDetailPage';
-import ChatPage from './ChatPage';
+import Login from './Login';
+import Dashboard from './Dashboard';
+import Profile from './Profile';
+import AddFood from './AddFood';
+import FoodDetail from './FoodDetail';
+import Chat from './Chat';
 import Navbar from '../components/Navbar';
 
 function App() {
@@ -13,12 +13,12 @@ function App() {
       <div className="min-h-screen w-full max-w-md mx-auto bg-white text-black">
         <Navbar />
         <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/add" element={<AddFoodPage />} />
-          <Route path="/food/:id" element={<FoodDetailPage />} />
-          <Route path="/chat/:chatId" element={<ChatPage />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/add" element={<AddFood />} />
+          <Route path="/food/:id" element={<FoodDetail />} />
+          <Route path="/chat/:chatId" element={<Chat />} />
         </Routes>
       </div>
     </Router>
