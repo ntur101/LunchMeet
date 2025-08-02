@@ -77,7 +77,7 @@ function Profile() {
 
       {/* Inventory Section */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
+        {/* <div className="flex justify-between items-center mb-4"> */}
           <h2 className="text-xl font-semibold">Current Inventory</h2>
           <div className="text-sm text-gray-600">
             {profile.inventory.length} item{profile.inventory.length !== 1 ? 's' : ''} total
@@ -87,7 +87,7 @@ function Profile() {
               </span>
             )}
           </div>
-        </div>
+        {/* </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {profile.inventory.map((item) => (
             <Card key={item.id} className="w-full max-w-sm shadow-md">
@@ -97,26 +97,8 @@ function Profile() {
                     src={getImageSource(item)}
                     alt={item.title}
                     className="absolute inset-0 w-full h-full object-cover rounded-t-md"
-                    onError={(e) => {
-                      // Fallback to a placeholder if image fails to load
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZvb2QgSW1hZ2U8L3RleHQ+PC9zdmc+';
-                    }}
+                    
                   />
-                  
-                  {/* Camera indicator for captured images */}
-                  {item.source === 'camera_capture' && (
-                    <div className="absolute top-2 left-2 bg-blue-500 text-white p-1 rounded-md flex items-center gap-1 text-xs">
-                      <Camera className="w-3 h-3" />
-                      <span>Captured</span>
-                    </div>
-                  )}
-                  
-                  {/* Confidence indicator for AI-detected items */}
-                  {item.confidence && (
-                    <div className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-md text-xs">
-                      {Math.round(item.confidence * 100)}% confident
-                    </div>
-                  )}
                   
                   <div className="absolute top-2 right-2 flex gap-2 z-10">
                     <button
@@ -138,56 +120,12 @@ function Profile() {
                 <CardTitle className="text-lg font-semibold mt-2 text-center">
                   {item.title}
                 </CardTitle>
-                {/* Show date added for camera-captured items */}
-                {item.dateAdded && (
-                  <div className="flex items-center justify-center gap-1 text-xs text-gray-500 mt-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>Added {formatDate(item.dateAdded)}</span>
-                  </div>
-                )}
               </CardContent>
             </Card>
           ))}
         </div>
-        
-        {/* Empty state when no items */}
-        {profile.inventory.length === 0 && (
-          <div className="text-center py-12">
-            <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">No food items yet</h3>
-            <p className="text-gray-500 mb-6">Start by capturing some food with your camera!</p>
-            <Link to="/add-food">
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Item
-              </Button>
-            </Link>
-          </div>
-        )}
       </div>
 
-      {/* Add Button */}
-      <div className="text-center space-y-2">
-        <Link to="/add-food">
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white mr-2">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Food with Camera
-          </Button>
-        </Link>
-        
-        {/* Test button to add a sample camera-captured item */}
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            addTestCameraItem('user1');
-            setProfile(getUserProfile('user1'));
-          }}
-          className="ml-2"
-        >
-          <Camera className="w-4 h-4 mr-2" />
-          Add Test Item
-        </Button>
-      </div>
 
       {/* Dialogs */}
       {dialogType === 'edit' && (
