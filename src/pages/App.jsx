@@ -5,6 +5,7 @@ import Profile from './Profile';
 import AddFood from './AddFood';
 import FoodDetail from './FoodDetail';
 import Chat from './Chat';
+import ChatList from './ChatList';
 
 function App() {
   return (
