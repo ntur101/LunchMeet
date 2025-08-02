@@ -52,22 +52,6 @@ function FoodDetail() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* Purple Header */}
-      <div className="bg-purple-600 px-4 py-4 flex items-center">
-        <button className="mr-4">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div className="flex-1 bg-white rounded-full px-4 py-2">
-          <input 
-            type="text" 
-            placeholder="Search for food" 
-            className="w-full outline-none text-gray-700"
-          />
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 px-4 py-6">
         {/* Apple Image */}
