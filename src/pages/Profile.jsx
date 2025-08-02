@@ -105,13 +105,13 @@ function Profile() {
                       className="p-2 rounded-md bg-white/80 backdrop-blur hover:bg-white"
                       onClick={() => openDialog('edit', item)}
                     >
-                      <Pencil className="w-4 h-4" />
+                      <Pencil className="w-4 h-4 text-gray-700" />
                     </button>
                     <button
                       className="p-2 rounded-md bg-white/80 backdrop-blur hover:bg-white"
                       onClick={() => openDialog('delete', item)}
                     >
-                      <Trash className="w-4 h-4" />
+                      <Trash className="w-4 h-4 text-red-500" />
                     </button>
                   </div>
                 </div>

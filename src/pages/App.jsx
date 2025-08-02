@@ -13,7 +13,7 @@ function AppContent() {
   const showHeader = location.pathname !== '/login';
 
   return (
-    <div className="min-h-screen w-full max-w-md mx-auto">
+    <div className="min-h-screen w-full max-w-md mx-auto bg-white text-black">
       {showHeader && <HeaderBar />}
       <Routes>
         <Route path="/login" element={<Login />} />
