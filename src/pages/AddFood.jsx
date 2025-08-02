@@ -229,8 +229,8 @@ function AddFood() {
 
   const finishAdding = () => {
     console.log(`Saved ${savedPhotos.length} photos to localStorage`);
-    // Navigate back to home
-    navigate('/');
+    // Navigate to profile to see the updated inventory
+    navigate('/profile');
   };
 
   const startOver = () => {
@@ -402,7 +402,7 @@ function AddFood() {
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Check className="w-5 h-5" />
-                Finish ({savedPhotos.length} photo{savedPhotos.length !== 1 ? 's' : ''})
+                View Inventory ({savedPhotos.length} photo{savedPhotos.length !== 1 ? 's' : ''})
               </button>
               
               {/* Take Another Button */}
