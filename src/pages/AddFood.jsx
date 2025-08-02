@@ -1,16 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
-import { Camera, RotateCcw, Check, X, Loader2, Plus, SkipForward } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Camera, RotateCcw, Check, X, Loader2, Plus } from 'lucide-react';
+import { detectFood } from '../lib/foodDetection';
 
 function AddFood() {
+  const navigate = useNavigate();
   const [stream, setStream] = useState(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [cameraError, setCameraError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [croppedPortions, setCroppedPortions] = useState([]);
-  const [currentPortionIndex, setCurrentPortionIndex] = useState(0);
-  const [showCroppedView, setShowCroppedView] = useState(false);
-  const [addedItems, setAddedItems] = useState([]);
+  const [isRestartingCamera, setIsRestartingCamera] = useState(false);
+  const [savedPhotos, setSavedPhotos] = useState([]);
+  const [showSavedConfirmation, setShowSavedConfirmation] = useState(false);
+  const [detectedFoodName, setDetectedFoodName] = useState('');
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -29,13 +32,22 @@ function AddFood() {
         URL.revokeObjectURL(capturedImage.url);
       }
       
-      croppedPortions.forEach(portion => {
-        if (portion.image && portion.image.startsWith('blob:')) {
-          URL.revokeObjectURL(portion.image);
+      savedPhotos.forEach(photo => {
+        if (photo.url && photo.url.startsWith('blob:')) {
+          URL.revokeObjectURL(photo.url);
         }
       });
     };
   }, []);
+
+  // Effect to connect stream to video element
+  useEffect(() => {
+    if (stream && videoRef.current && !isRestartingCamera && !showSavedConfirmation) {
+      console.log('Connecting stream to video element');
+      videoRef.current.srcObject = stream;
+      videoRef.current.play().catch(console.error);
+    }
+  }, [stream, isRestartingCamera, showSavedConfirmation]);
 
   // Debug logging
   useEffect(() => {
@@ -43,18 +55,24 @@ function AddFood() {
       isLoading,
       cameraError,
       isProcessing,
-      showCroppedView,
-      currentPortionIndex,
-      totalPortions: croppedPortions.length,
+      isRestartingCamera,
+      showSavedConfirmation,
+      savedPhotosCount: savedPhotos.length,
       hasStream: !!stream,
       hasCapturedImage: !!capturedImage
     });
-  }, [isLoading, cameraError, isProcessing, showCroppedView, currentPortionIndex, croppedPortions.length, stream, capturedImage]);
+  }, [isLoading, cameraError, isProcessing, isRestartingCamera, showSavedConfirmation, savedPhotos.length, stream, capturedImage]);
 
   const startCamera = async () => {
     try {
       setIsLoading(true);
       setCameraError(null);
+      
+      // Stop existing stream if it exists
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        setStream(null);
+      }
       
       // Check if getUserMedia is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -76,6 +94,7 @@ function AddFood() {
       // Set the video source to the stream
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.play().catch(console.error);
       }
       
       setIsLoading(false);
@@ -126,161 +145,99 @@ function AddFood() {
   const confirmPhoto = async () => {
     setIsProcessing(true);
     
-    // Stop the camera stream
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    
-    // Simulate AI processing and food detection
     try {
-      const croppedItems = await simulateFoodDetection(capturedImage);
-      setCroppedPortions(croppedItems);
-      setCurrentPortionIndex(0);
-      setShowCroppedView(true);
+      // Detect food using AI
+      const foodName = await detectFood(capturedImage.blob);
+      setDetectedFoodName(foodName);
+      
+      // Convert image to base64 for localStorage
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        
+        // Convert to base64
+        const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // Generate a unique ID for this photo
+        const photoId = Date.now();
+        
+        // Save to localStorage with AI-detected name
+        localStorage.setItem(`food-image-${photoId}`, base64Image);
+        localStorage.setItem(`food-name-${photoId}`, foodName);
+        
+        // Add to saved photos list
+        const newPhoto = {
+          id: photoId,
+          url: capturedImage.url,
+          base64: base64Image,
+          name: foodName,
+          timestamp: new Date().toISOString()
+        };
+        
+        setSavedPhotos(prev => [...prev, newPhoto]);
+        setCapturedImage(null);
+        setShowSavedConfirmation(true);
+        setIsProcessing(false);
+        
+        // Keep camera running in background for taking another photo
+        // Don't stop the stream here
+      };
+      
+      img.src = capturedImage.url;
     } catch (error) {
-      console.error('Error processing image:', error);
-    } finally {
+      console.error('Error saving photo:', error);
       setIsProcessing(false);
     }
   };
 
-  const simulateFoodDetection = async (image) => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
+  const getNextPhotoId = () => {
+    let nextId = 1;
     
-    // Log image dimensions for debugging
-    console.log('Captured image dimensions:', {
-      width: image.width,
-      height: image.height
-    });
-    
-    // Generate mock cropped portions with bounding boxes for landscape images
-    // Using percentages and then converting to actual pixels
-    const imageWidth = image.width || 1920;
-    const imageHeight = image.height || 1080;
-    
-    const mockCroppedPortions = [
-      {
-        id: 1,
-        name: "Sandwich",
-        confidence: 0.92,
-        image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.0), // 10% from left
-          y: Math.floor(imageHeight * 0.16), // 20% from top
-          width: Math.floor(imageWidth * 0.7), // 35% of width
-          height: Math.floor(imageHeight * 0.7) // 60% of height
-        }
-      },
-      {
-        id: 2,
-        name: "Apple", 
-        confidence: 0.87,
-        image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.4), // 10% from left
-          y: Math.floor(imageHeight * 0.10), // 20% from top
-          width: Math.floor(imageWidth * 0.45), // 35% of width
-          height: Math.floor(imageHeight * 0.45) // 60% of height
-        }
-      },
-      {
-        id: 3,
-        name: "Chips",
-        confidence: 0.78,
-        image: image.url,
-        boundingBox: { 
-          x: Math.floor(imageWidth * 0.4), // 10% from left
-          y: Math.floor(imageHeight * 0.45), // 20% from top
-          width: Math.floor(imageWidth * 0.45), // 35% of width
-          height: Math.floor(imageHeight * 0.45) // 60% of height
+    // Check localStorage to find the highest existing food-image ID
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('food-image-')) {
+        const id = parseInt(key.replace('food-image-', ''));
+        if (id >= nextId) {
+          nextId = id + 1;
         }
       }
-    ];
-    
-    console.log('Generated bounding boxes:', mockCroppedPortions.map(p => ({
-      name: p.name,
-      boundingBox: p.boundingBox
-    })));
-    
-    // Create cropped images for each portion
-    const croppedPortions = await Promise.all(
-      mockCroppedPortions.map(async (portion) => {
-        const croppedImageUrl = await cropImage(image.url, portion.boundingBox);
-        return {
-          ...portion,
-          image: croppedImageUrl
-        };
-      })
-    );
-    
-    return croppedPortions;
-  };
-
-  const cropImage = async (imageUrl, boundingBox) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size to the bounding box dimensions
-        canvas.width = boundingBox.width;
-        canvas.height = boundingBox.height;
-        
-        // Draw the cropped portion of the image
-        ctx.drawImage(
-          img,
-          boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, // Source rectangle
-          0, 0, boundingBox.width, boundingBox.height // Destination rectangle
-        );
-        
-        // Convert canvas to blob URL
-        canvas.toBlob((blob) => {
-          const croppedUrl = URL.createObjectURL(blob);
-          resolve(croppedUrl);
-        }, 'image/jpeg', 0.8);
-      };
-      
-      img.src = imageUrl;
-    });
-  };
-
-  const addFoodItem = (item) => {
-    console.log('Adding food item:', item);
-    setAddedItems(prev => [...prev, item]);
-    goToNextPortion();
-  };
-
-  const skipFoodItem = () => {
-    console.log('Skipping food item');
-    goToNextPortion();
-  };
-
-  const goToNextPortion = () => {
-    if (currentPortionIndex < croppedPortions.length - 1) {
-      setCurrentPortionIndex(prev => prev + 1);
-    } else {
-      // Finished with all portions
-      finishAdding();
     }
+    
+    return nextId;
+  };
+
+  const takeAnotherPhoto = async () => {
+    setIsRestartingCamera(true);
+    setShowSavedConfirmation(false);
+    setDetectedFoodName(''); // Reset detected food name
+    
+    // Short delay for the loading animation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simply restart the camera using the existing startCamera function
+    // This will handle all the complexity of stopping and starting properly
+    await startCamera();
+    
+    setIsRestartingCamera(false);
   };
 
   const finishAdding = () => {
-    console.log('Finished adding food items:', addedItems);
-    // Here you would typically save to database or navigate somewhere
-    alert(`Added ${addedItems.length} food items: ${addedItems.map(item => item.name).join(', ')}`);
-    startOver();
+    console.log(`Saved ${savedPhotos.length} photos to localStorage`);
+    // Navigate back to home
+    navigate('/');
   };
 
   const startOver = () => {
-    // Clean up cropped image URLs to prevent memory leaks
-    croppedPortions.forEach(portion => {
-      if (portion.image && portion.image.startsWith('blob:')) {
-        URL.revokeObjectURL(portion.image);
+    // Clean up saved photo URLs to prevent memory leaks
+    savedPhotos.forEach(photo => {
+      if (photo.url && photo.url.startsWith('blob:')) {
+        URL.revokeObjectURL(photo.url);
       }
     });
     
@@ -291,11 +248,10 @@ function AddFood() {
     
     // Reset all states
     setCapturedImage(null);
-    setCroppedPortions([]);
-    setShowCroppedView(false);
-    setCurrentPortionIndex(0);
-    setAddedItems([]);
+    setSavedPhotos([]);
+    setShowSavedConfirmation(false);
     setIsProcessing(false);
+    setDetectedFoodName(''); // Reset detected food name
     // Restart camera
     startCamera();
   };
@@ -334,8 +290,9 @@ function AddFood() {
     return (
       <div className="flex items-center justify-center bg-black" style={{ height: 'calc(100vh - 60px)' }}>
         <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Starting camera...</p>
+          <Loader2 className="w-16 h-16 animate-spin mx-auto mb-6 text-blue-500" />
+          <h2 className="text-xl font-semibold mb-2">Starting camera...</h2>
+          <p className="text-white/80">Getting ready to take photos</p>
         </div>
       </div>
     );
@@ -358,24 +315,13 @@ function AddFood() {
                 // Skip camera and go directly to demo mode
                 setCameraError(null);
                 setIsLoading(false);
-                setShowCroppedView(true);
-                setCurrentPortionIndex(0);
-                setCroppedPortions([
-                  {
-                    id: 1,
-                    name: "Demo Sandwich",
-                    confidence: 0.92,
-                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkZvb2QgSW1hZ2U8L3RleHQ+PC9zdmc+",
-                    boundingBox: { x: 0, y: 30, width: 150, height: 200 }
-                  },
-                  {
-                    id: 2,
-                    name: "Demo Apple",
-                    confidence: 0.87,
-                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFwcGxlPC90ZXh0Pjwvc3ZnPg==",
-                    boundingBox: { x: 300, y: 100, width: 120, height: 120 }
-                  }
-                ]);
+                // Set up a demo captured image
+                setCapturedImage({
+                  url: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzY2NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkRlbW8gRm9vZCBQaG90bzwvdGV4dD48L3N2Zz4=",
+                  blob: null,
+                  width: 400,
+                  height: 300
+                });
               }}
               className="block w-full bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
             >
@@ -390,114 +336,90 @@ function AddFood() {
   return (
     <div className="relative bg-black" style={{ height: 'calc(100vh - 60px)' }}>
       {/* Processing/Loading Screen */}
-      {isProcessing && (
+      {(isProcessing || isRestartingCamera) && (
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" style={{ top: 0 }}>
           <div className="text-white text-center">
             <Loader2 className="w-16 h-16 animate-spin mx-auto mb-6 text-blue-500" />
-            <h2 className="text-xl font-semibold mb-2">Analyzing your food...</h2>
-            <p className="text-white/80">Using AI to detect food items</p>
-            <div className="mt-6 w-64 bg-gray-700 rounded-full h-2 mx-auto">
-              <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{width: '70%'}}></div>
-            </div>
+            <h2 className="text-xl font-semibold mb-2">
+              {isRestartingCamera ? 'Restarting camera...' : 'Analyzing your photo...'}
+            </h2>
+            <p className="text-white/80">
+              {isRestartingCamera ? 'Getting ready for another photo' : 'Using AI to identify what you captured'}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Individual Cropped Portion View */}
-      {showCroppedView && croppedPortions.length > 0 && (
+      {/* Photo Saved Confirmation */}
+      {showSavedConfirmation && (
         <div className="bg-white flex flex-col" style={{ height: 'calc(100vh - 60px)' }}>
           {/* Header */}
           <div className="bg-white border-b border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">
-                  {croppedPortions[currentPortionIndex]?.name}
-                </h1>
+                <h1 className="text-xl font-bold text-gray-900">Photo Saved!</h1>
                 <p className="text-sm text-gray-500">
-                  {currentPortionIndex + 1} of {croppedPortions.length} detected items
+                  {savedPhotos.length} photo{savedPhotos.length !== 1 ? 's' : ''} in your inventory
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">
-                  Confidence: {Math.round((croppedPortions[currentPortionIndex]?.confidence || 0) * 100)}%
-                </p>
-                <button
-                  onClick={startOver}
-                  className="text-xs text-blue-500 hover:text-blue-600"
-                >
-                  Start Over
-                </button>
-              </div>
+              <button
+                onClick={startOver}
+                className="text-xs text-blue-500 hover:text-blue-600"
+              >
+                Start Over
+              </button>
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="bg-gray-100 h-2">
-            <div 
-              className="bg-blue-500 h-2 transition-all duration-300"
-              style={{ width: `${((currentPortionIndex + 1) / croppedPortions.length) * 100}%` }}
-            />
-          </div>
-
-          {/* Food Image */}
+          {/* Saved Photo Display */}
           <div className="flex-1 flex items-center justify-center p-6 bg-gray-50">
-            <div className="w-full max-w-sm">
-              <div className="aspect-square bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-                <img
-                  src={croppedPortions[currentPortionIndex]?.image}
-                  alt={croppedPortions[currentPortionIndex]?.name}
-                  className="w-full h-full object-cover"
-                />
+            <div className="w-full max-w-sm text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Check className="w-10 h-10 text-green-600" />
               </div>
               
-              {/* Food Info */}
-              <div className="mt-6 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {croppedPortions[currentPortionIndex]?.name}
-                </h2>
-                <p className="text-gray-600">
-                  Would you like to add this to your inventory?
-                </p>
-              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {detectedFoodName} Detected!
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Your {detectedFoodName.toLowerCase()} photo has been added to your inventory.
+              </p>
+              
+              {savedPhotos.length > 0 && (
+                <div className="text-sm text-gray-500 mb-6">
+                  Total photos: {savedPhotos.length}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="bg-white border-t border-gray-200 p-6">
             <div className="flex gap-4">
-              {/* Skip Button */}
+              {/* Finish Button */}
               <button
-                onClick={skipFoodItem}
+                onClick={finishAdding}
                 className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
-                <SkipForward className="w-5 h-5" />
-                Skip
+                <Check className="w-5 h-5" />
+                Finish ({savedPhotos.length} photo{savedPhotos.length !== 1 ? 's' : ''})
               </button>
               
-              {/* Add Button */}
+              {/* Take Another Button */}
               <button
-                onClick={() => addFoodItem(croppedPortions[currentPortionIndex])}
+                onClick={takeAnotherPhoto}
                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
-                Add to Inventory
+                Take Another
               </button>
             </div>
-            
-            {/* Added Items Counter */}
-            {addedItems.length > 0 && (
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-500">
-                  Added {addedItems.length} item{addedItems.length !== 1 ? 's' : ''} so far
-                </p>
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      {/* Camera View - Only show if not processing and not showing cropped view */}
-      {!isProcessing && !showCroppedView && !capturedImage && (
+      {/* Camera View - Only show if not processing and not showing saved confirmation */}
+      {!isProcessing && !isRestartingCamera && !showSavedConfirmation && !capturedImage && (
         <div className="relative w-full h-full">
           <video
             ref={videoRef}
@@ -539,8 +461,8 @@ function AddFood() {
         </div>
       )}
 
-      {/* Photo Preview - Only show if not processing and not showing cropped view */}
-      {!isProcessing && !showCroppedView && capturedImage && (
+      {/* Photo Preview - Only show if not processing and not showing saved confirmation */}
+      {!isProcessing && !isRestartingCamera && !showSavedConfirmation && capturedImage && (
         <div className="relative w-full h-full">
           <img
             src={capturedImage.url}
@@ -569,7 +491,7 @@ function AddFood() {
             </div>
             <div className="flex justify-center gap-8 mt-2">
               <span className="text-white/80 text-sm">Retake</span>
-              <span className="text-white/80 text-sm">Analyze</span>
+              <span className="text-white/80 text-sm">Save & Analyze</span>
             </div>
           </div>
           
