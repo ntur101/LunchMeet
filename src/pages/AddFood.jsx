@@ -167,22 +167,22 @@ function AddFood() {
         confidence: 0.92,
         image: image.url,
         boundingBox: { 
-          x: Math.floor(imageWidth * 0.2), // 20% from left
-          y: Math.floor(imageHeight * 0.0), // 0% from top
-          width: Math.floor(imageHeight * 0.7), // 70% of width
-          height: Math.floor(imageWidth * 0.7) // 70% of height
+          x: Math.floor(imageWidth * 0.0), // 10% from left
+          y: Math.floor(imageHeight * 0.16), // 20% from top
+          width: Math.floor(imageWidth * 0.7), // 35% of width
+          height: Math.floor(imageHeight * 0.7) // 60% of height
         }
-      }, 
+      },
       {
         id: 2,
         name: "Apple", 
         confidence: 0.87,
         image: image.url,
         boundingBox: { 
-          x: Math.floor(imageWidth * 0.55), // 55% from left
-          y: Math.floor(imageHeight * 0.0), // 0% from top
-          width: Math.floor(imageHeight * 0.4), // 40% of width
-          height: Math.floor(imageWidth * 0.4) // 40% of height
+          x: Math.floor(imageWidth * 0.4), // 10% from left
+          y: Math.floor(imageHeight * 0.10), // 20% from top
+          width: Math.floor(imageWidth * 0.45), // 35% of width
+          height: Math.floor(imageHeight * 0.45) // 60% of height
         }
       },
       {
@@ -191,10 +191,10 @@ function AddFood() {
         confidence: 0.78,
         image: image.url,
         boundingBox: { 
-          x: Math.floor(imageWidth * 0.55), // 55% from left
-          y: Math.floor(imageHeight * 0.2), // 20% from top
-          width: Math.floor(imageHeight * 0.6), // 60% of width
-          height: Math.floor(imageWidth * 0.6) // 60% of height
+          x: Math.floor(imageWidth * 0.4), // 10% from left
+          y: Math.floor(imageHeight * 0.45), // 20% from top
+          width: Math.floor(imageWidth * 0.45), // 35% of width
+          height: Math.floor(imageHeight * 0.45) // 60% of height
         }
       }
     ];
