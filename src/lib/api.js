@@ -48,6 +48,17 @@ export function getFoodListings(filters) {
   return database.foodListings; // Ignore filters for simplicity
 }
 
+export function searchFoodListings(searchTerm) {
+  if (!searchTerm || searchTerm.trim() === '') {
+    return database.foodListings;
+  }
+  
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  return database.foodListings.filter(item => 
+    item.title.toLowerCase().includes(lowerSearchTerm)
+  );
+}
+
 export function getFoodDetails(foodId) {
   return database.foodListings.find((item) => item.id === foodId);
 }
