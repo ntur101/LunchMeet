@@ -405,7 +405,7 @@ function AddFood() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 60px)' }}>
+      <div className="flex items-center justify-center bg-black" style={{ height: 'calc(100vh - 60px)' }}>
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Starting camera...</p>
@@ -416,7 +416,7 @@ function AddFood() {
 
   if (cameraError) {
     return (
-      <div className="flex items-center justify-center text-white p-4" style={{ height: 'calc(100vh - 60px)' }}>
+      <div className="flex items-center justify-center bg-black text-white p-4" style={{ height: 'calc(100vh - 60px)' }}>
         <div className="text-center">
           <p className="mb-4">{cameraError}</p>
           <div className="space-y-3">
@@ -445,7 +445,7 @@ function AddFood() {
                     id: 2,
                     name: "Demo Apple",
                     confidence: 0.87,
-                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFwcGxlPC90ZXh0Pjwvc3ZnPg==",
+                    image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmZjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFwcGxlPC90ZXh0Pjwvc3ZnPg==",
                     boundingBox: { x: 300, y: 100, width: 120, height: 120 }
                   }
                 ]);
@@ -461,10 +461,10 @@ function AddFood() {
   }
 
   return (
-    <div className="relative" style={{ height: 'calc(100vh - 60px)' }}>
+    <div className="relative bg-black" style={{ height: 'calc(100vh - 60px)' }}>
       {/* Processing/Loading Screen */}
       {isProcessing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ top: 0 }}>
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" style={{ top: 0 }}>
           <div className="text-white text-center">
             <Loader2 className="w-16 h-16 animate-spin mx-auto mb-6 text-blue-500" />
             <h2 className="text-xl font-semibold mb-2">Analyzing your food...</h2>
@@ -577,11 +577,11 @@ function AddFood() {
             autoPlay
             playsInline
             muted
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain bg-black"
           />
           
           {/* Camera Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
             <div className="flex items-center justify-between">
               {/* Switch Camera Button */}
               <button
@@ -605,7 +605,7 @@ function AddFood() {
           </div>
           
           {/* Top overlay with title */}
-          <div className="absolute top-0 left-0 right-0 p-4">
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4">
             <h1 className="text-white text-xl font-semibold text-center">Add Food</h1>
             <p className="text-white/80 text-sm text-center mt-1">Take a photo of your food</p>
           </div>
@@ -618,11 +618,11 @@ function AddFood() {
           <img
             src={capturedImage.url}
             alt="Captured food"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain bg-black"
           />
           
           {/* Photo Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
             <div className="flex items-center justify-center gap-8">
               {/* Retake Button */}
               <button
@@ -647,7 +647,7 @@ function AddFood() {
           </div>
           
           {/* Top overlay */}
-          <div className="absolute top-0 left-0 right-0 p-4">
+          <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent p-4">
             <h1 className="text-white text-xl font-semibold text-center">Photo Preview</h1>
           </div>
         </div>

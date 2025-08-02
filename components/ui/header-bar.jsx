@@ -24,20 +24,20 @@ export function HeaderBar() {
     setSearchTerm(e.target.value);
   };
   return (
-    <div className="w-full flex items-center justify-between px-4 py-3 space-x-2">
+    <div className="w-full flex items-center justify-between bg-[#C5BAFF] px-4 py-3 space-x-2">
       
       {isHome ? (
         // Show Profile icon on Home
         <Link to="/profile">
           <div className="rounded-xl p-2 hover:bg-white transition">
-            <CircleUserRound className="h-7 w-7 " />
+            <CircleUserRound className="h-7 w-7 text-white" />
           </div>
         </Link>
       ) : (
         // Show Home icon on other pages
         <Link to="/">
           <div className="rounded-xl p-2 hover:bg-white transition">
-            <House className="h-7 w-7 " />
+            <House className="h-7 w-7 text-white" />
           </div>
         </Link>
       )}
@@ -58,7 +58,7 @@ export function HeaderBar() {
       {/* Right icon */}
       <Link to="/chats">
         <div className="rounded-xl p-2 hover:bg-white transition">
-          <MessageCircle className="h-7 w-7 " />
+          <MessageCircle className="h-7 w-7 text-white" />
         </div>
       </Link>
     </div>
