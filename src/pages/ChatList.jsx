@@ -19,10 +19,10 @@ function ChatList() {
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <div className="font-semibold text-gray-900">{chat.name}</div>
-                <div className="text-sm text-gray-600 mt-1">{chat.lastMessage}</div>
+                <div className="font-semibold">{chat.name}</div>
+                <div className="text-sm mt-1">{chat.lastMessage}</div>
               </div>
-              <div className="text-xs text-gray-400 ml-2">{chat.timestamp}</div>
+              <div className="text-xs ml-2">{chat.timestamp}</div>
             </div>
           </Link>
         ))}
