@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getFoodDetails } from "../lib/api"; // or adjust path if needed
 
-import appleImage from '../assets/red_apple.jpeg';
 import orangeJuiceImage from '../assets/orange_juice.webp';
 import upAndGoImage from '../assets/Up_and_Go.jpeg';
 
@@ -11,20 +10,44 @@ function FoodDetail() {
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [foodItem, setFoodItem] = useState(null);
+  const [userItems, setUserItems] = useState([]);
 
   useEffect(() => {
     const data = getFoodDetails(parseInt(id)); // look up by ID
     setFoodItem(data);
   }, [id]);
 
+  // Load user's inventory from localStorage
+  useEffect(() => {
+    loadUserInventory();
+  }, []);
 
-  // Mock user's items for the trade selection
-  const userItems = [
-    { id: 1, name: 'Red Apple', image: appleImage },
-    { id: 2, name: 'Orange Juice', image: orangeJuiceImage },
-    { id: 3, name: 'Up&Go Drink', image: upAndGoImage },
-    { id: 4, name: 'Banana', image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=150&h=150&fit=crop' }
-  ];
+  const loadUserInventory = () => {
+    const items = [];
+    
+    // Scan localStorage for food items
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('food-image-')) {
+        const itemId = key.replace('food-image-', '');
+        const imageData = localStorage.getItem(key);
+        const nameData = localStorage.getItem(`food-name-${itemId}`);
+        
+        if (imageData && nameData) {
+          items.push({
+            id: itemId,
+            name: nameData,
+            image: imageData, // This is base64 data
+            timestamp: parseInt(itemId)
+          });
+        }
+      }
+    }
+    
+    // Sort by timestamp (newest first)
+    items.sort((a, b) => b.timestamp - a.timestamp);
+    setUserItems(items);
+  };
 
   const handleTradeClick = () => {
     setShowTradeModal(true);
@@ -107,7 +130,7 @@ function FoodDetail() {
         <div className="flex justify-center">
           <button 
             onClick={handleTradeClick}
-            className="bg-[#C5BAFF] text-white px-16 py-4 rounded-full text-xl font-semibold hover:bg-gray-500 transition-colors"
+            className="bg-[#C5BAFF] text-white px-16 py-4 rounded-full text-xl font-semibold hover:bg-gray-500 transition-colors shadow-lg"
           >
             Trade
           </button>
@@ -116,67 +139,82 @@ function FoodDetail() {
 
       {/* Trade Modal Popup */}
       {showTradeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#C5BAFF] rounded-2xl p-6 w-80 mx-4 shadow-2xl">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-6 text-white">Select What To Trade</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#C5BAFF] rounded-2xl w-full max-w-sm mx-4 shadow-2xl max-h-[80vh] flex flex-col">
+            <div className="p-5 flex-shrink-0">
+              <h3 className="text-2xl font-bold mb-4 text-white text-center">Select What To Trade</h3>
               
-              {/* 2x2 Grid of Items */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {userItems.map((item) => {
-                  const isSelected = selectedItems.find(selected => selected.id === item.id);
-                  const selectionNumber = getItemSelectionNumber(item.id);
-                  
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleItemSelect(item)}
-                      className={`relative bg-white rounded-lg p-3 cursor-pointer transition-all duration-200 ${
-                        isSelected ? 'ring-4 ring-yellow-300 shadow-lg' : 'hover:shadow-md'
-                      }`}
-                    >
-                      {/* Selection Circle */}
-                      <div className="absolute top-2 right-2 w-6 h-6">
-                        {isSelected ? (
-                          <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white shadow-md">
-                            <span className="text-xs font-bold text-purple-800">{selectionNumber}</span>
+              {userItems.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-purple-100 mb-4">No items in your inventory yet!</p>
+                  <p className="text-purple-200 text-sm">Take some photos to add items you can trade.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Scrollable Grid of Items */}
+                  <div className="max-h-75 overflow-y-auto mb-6  p-2">
+                    <div className="grid grid-cols-2 gap-3 pr-2">
+                      {userItems.map((item) => {
+                        const isSelected = selectedItems.find(selected => selected.id === item.id);
+                        const selectionNumber = getItemSelectionNumber(item.id);
+                        
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => handleItemSelect(item)}
+                            className={`relative bg-white rounded-lg py-3 cursor-pointer transition-all duration-200 ${
+                              isSelected ? 'ring-4 ring-yellow-300 shadow-lg' : 'hover:shadow-md'
+                            }`}
+                          >
+                            {/* Selection Circle */}
+                            <div className="absolute top-2 right-2 w-6 h-6">
+                              {isSelected ? (
+                                <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+                                  <span className="text-xs font-bold text-purple-800">{selectionNumber}</span>
+                                </div>
+                              ) : (
+                                <div className="w-6 h-6 border-2 border-gray-300 rounded-full bg-white"></div>
+                              )}
+                            </div>
+                            
+                            {/* Item Image */}
+                            <img 
+                              src={item.image}
+                              alt={item.name}
+                              className="w-25 h-20 object-cover rounded-lg mx-auto mb-2"
+                            />
+                            
+                            {/* Item Name */}
+                            <p className="text-xs font-medium text-gray-800 text-center truncate">{item.name}</p>
                           </div>
-                        ) : (
-                          <div className="w-6 h-6 border-2 border-gray-300 rounded-full bg-white"></div>
-                        )}
-                      </div>
-                      
-                      {/* Item Image */}
-                      <img 
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded-lg mx-auto mb-2"
-                      />
-                      
-                      {/* Item Name */}
-                      <p className="text-xs font-medium text-gray-800 text-center">{item.name}</p>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
-              
-              {/* Selection Info */}
-              <div className="mb-4">
-                <p className="text-sm text-purple-100">
-                  Selected: {selectedItems.length}/{userItems.length} items
-                </p>
-                {selectedItems.length > 0 && (
-                  <div className="mt-2 flex justify-center flex-wrap gap-1">
-                    {selectedItems.map((item, index) => (
-                      <span key={item.id} className="text-xs bg-yellow-400 text-purple-800 px-2 py-1 rounded-full font-medium">
-                        {index + 1}. {item.name}
-                      </span>
-                    ))}
                   </div>
-                )}
-              </div>
-              
-              {/* Action Buttons */}
+                  
+                  {/* Selection Info */}
+                  <div className="mb-4">
+                    <p className="text-sm text-purple-100">
+                      Selected: {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''}
+                    </p>
+                    {selectedItems.length > 0 && (
+                      <div className="mt-2 max-h-16 overflow-y-auto">
+                        <div className="flex flex-wrap gap-1">
+                          {selectedItems.map((item, index) => (
+                            <span key={item.id} className="text-xs bg-yellow-400 text-purple-800 px-2 py-1 rounded-full font-medium">
+                              {index + 1}. {item.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+            
+            {/* Action Buttons - Fixed at bottom */}
+            <div className="p-6 pt-0 flex-shrink-0">
               <div className="flex space-x-4">
                 <button 
                   onClick={closeModal}
@@ -186,14 +224,14 @@ function FoodDetail() {
                 </button>
                 <button 
                   onClick={handleConfirmTrade}
-                  disabled={selectedItems.length === 0}
+                  disabled={selectedItems.length === 0 || userItems.length === 0}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
-                    selectedItems.length > 0 
+                    selectedItems.length > 0 && userItems.length > 0
                       ? 'bg-yellow-400 text-purple-800 hover:bg-yellow-300' 
                       : 'bg-gray-400 text-gray-600 cursor-not-allowed'
                   }`}
                 >
-                  Confirm ({selectedItems.length})
+                  {userItems.length === 0 ? 'No Items' : `Confirm (${selectedItems.length})`}
                 </button>
               </div>
             </div>
