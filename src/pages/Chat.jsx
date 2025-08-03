@@ -3,10 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { X } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
 
 function Chat() {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const { clearNewMessage } = useNotification();
+  
+  // Clear notification when entering Sarah's chat
+  useEffect(() => {
+    if (chatId === "sarah-m") {
+      clearNewMessage();
+    }
+  }, [chatId, clearNewMessage]);
   
   // Map chatId to display names
   const chatNames = {

@@ -9,6 +9,7 @@ import Chat from './Chat';
 import ChatList from './ChatList';
 import { HeaderBar } from '/components/ui/header-bar';
 import { UserProvider } from './UserContext';
+import { NotificationProvider } from '../contexts/NotificationContext';
 
 function AppContent() {
   const location = useLocation();
@@ -36,9 +37,11 @@ function AppContent() {
 function App() {
   return (
     <UserProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </NotificationProvider>
     </UserProvider>
   );
 }

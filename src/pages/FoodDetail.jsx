@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getFoodDetails } from "../lib/api"; // or adjust path if needed
+import { useNotification } from "../contexts/NotificationContext";
 
 import orangeJuiceImage from '../assets/orange_juice.webp';
 import upAndGoImage from '../assets/Up_and_Go.jpeg';
@@ -8,6 +9,7 @@ import upAndGoImage from '../assets/Up_and_Go.jpeg';
 function FoodDetail() {
   const { id } = useParams(); // pulls the "id" from the URL
   const navigate = useNavigate();
+  const { triggerNewMessage } = useNotification();
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [foodItem, setFoodItem] = useState(null);
@@ -78,7 +80,9 @@ function FoodDetail() {
     alert(`Trade offer sent with ${selectedItems.length} item(s)!`);
     setShowTradeModal(false);
     setSelectedItems([]);
-    // Redirect to home page after trade offer is sent
+    // Trigger notification and redirect to home page
+    console.log('Triggering new message notification...');
+    triggerNewMessage();
     navigate('/');
   };
 
