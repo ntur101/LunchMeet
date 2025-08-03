@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const mockChats = [
   { chatId: "sarah-m", name: "Sarah M.", lastMessage: "Sounds good! See you there", timestamp: "10:40 AM" },
-  { chatId: "mike-chen", name: "Mike Chen", lastMessage: "Thanks! The pizza was amazing 🍕", timestamp: "Yesterday" },
+  { chatId: "mike-chen", name: "Mike Chen", lastMessage: "I would like to offer you a sandwhich...", timestamp: "Yesterday" },
   { chatId: "jessica-l", name: "Jessica L.", lastMessage: "Is the salad still available?", timestamp: "Yesterday" },
   { chatId: "alex-k", name: "Alex K.", lastMessage: "Perfect! I'll be there at 1 PM", timestamp: "Monday" },
 ];

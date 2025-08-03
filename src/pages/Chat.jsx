@@ -76,8 +76,7 @@ function Chat() {
         setTimeout(() => {
           const responses = [
             "lets meet outside the library does 9:30 work?",
-            "Chur ma bro see you then",
-            "Perfect! See you soon",
+            "Awesome, see you then",
             "Sounds good to me!",
             "Thanks! You're the best 🙌"
           ];
