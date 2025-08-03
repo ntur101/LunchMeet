@@ -116,7 +116,7 @@ function Profile() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Profile</h1>
-            <p className="text-lg">Name: {username || "John Doe"}</p>
+            <p className="text-lg">Username: {username || "John Doe"}</p>
           </div>
           
           {/* Clear All Button */}

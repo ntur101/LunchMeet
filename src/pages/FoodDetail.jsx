@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getFoodDetails } from "../lib/api"; // or adjust path if needed
 
@@ -7,6 +7,7 @@ import upAndGoImage from '../assets/Up_and_Go.jpeg';
 
 function FoodDetail() {
   const { id } = useParams(); // pulls the "id" from the URL
+  const navigate = useNavigate();
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [foodItem, setFoodItem] = useState(null);
@@ -74,9 +75,11 @@ function FoodDetail() {
 
   const handleConfirmTrade = () => {
     console.log('Selected items for trade:', selectedItems);
-    alert(`Trade confirmed with ${selectedItems.length} item(s)!`);
+    alert(`Trade offer sent with ${selectedItems.length} item(s)!`);
     setShowTradeModal(false);
     setSelectedItems([]);
+    // Redirect to home page after trade offer is sent
+    navigate('/');
   };
 
   const getItemSelectionNumber = (itemId) => {
