@@ -173,9 +173,9 @@ function Profile() {
                     <img
                       src={getImageSource(item)}
                       alt={item.title}
-                      className="absolute inset-0 w-full h-full object-cover rounded-t-md"
+                      className="absolute left-4 right-4 bottom-2 w-[calc(100%-32px)] h-[calc(100%-12px)] object-cover rounded-md"
                     />
-                    <div className="absolute top-2 right-2 flex gap-2 z-10">
+                    <div className="absolute top-3 right-6 flex gap-2 z-10">
                       <button
                         className="p-2 rounded-md bg-white/80 backdrop-blur hover:bg-white"
                         onClick={() => openDialog('edit', item)}

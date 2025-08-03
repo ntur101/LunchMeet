@@ -54,9 +54,9 @@ function ChatList() {
       {chatConfigs.map((chatConfig) => {
         const metadata = chatsData[chatConfig.chatId];
         const hasUnread = unreadStatus[chatConfig.chatId];
-        const isSarah = chatConfig.chatId === "sarah-m";
-        const shouldHighlight = (isSarah && hasNewMessage) || hasUnread;
-        
+        const isKieran = chatConfig.chatId === "kieran-m";
+        const shouldHighlight = (isKieran && hasNewMessage) || hasUnread;
+
         return (
           <Link
             to={`/chat/${chatConfig.chatId}`}

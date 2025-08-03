@@ -22,7 +22,7 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     if (!user) return;
 
-    const chatIds = ["sarah-m", "mike-chen", "jessica-l", "alex-k"];
+    const chatIds = ["kieran-m", "mike-chen", "jessica-l", "alex-k"];
     const unreadStatuses = {};
     const unsubscribeFunctions = [];
 
