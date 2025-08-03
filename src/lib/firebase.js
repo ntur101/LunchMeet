@@ -4,14 +4,14 @@ import { getDatabase } from 'firebase/database';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "REDACTED_API_KEY",
-  authDomain: "lunchmeet-f4c94.firebaseapp.com",
-  databaseURL: "https://lunchmeet-f4c94-default-rtdb.firebaseio.com/",
-  projectId: "lunchmeet-f4c94",
-  storageBucket: "lunchmeet-f4c94.firebasestorage.app",
-  messagingSenderId: "347739190424",
-  appId: "1:347739190424:web:b777c0995c047ea7d64ced",
-  measurementId: "G-HVQPND630S"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
