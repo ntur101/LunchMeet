@@ -11,63 +11,63 @@
       "name": "John Doe",
       "classroom": "101",
       "inventory": [
-        { "id": 1, "title": "Apple", "image": "vbof.png" },
-        { "id": 2, "title": "Banana", "image": "vbof.png" },
-        { "id": 3, "title": "Orange", "image": "vbof.png" }
+        { "id": 1, "title": "Apple", "image": "apple.jpg" },
+        { "id": 2, "title": "Banana", "image": "banana.avif" },
+        { "id": 3, "title": "Orange", "image": "orange.jpg" }
       ]
     },
     "user2": {
       "name": "Jane Smith",
       "classroom": "102",
       "inventory": [
-        { "id": 4, "title": "Pizza", "image": "vbof.png" },
-        { "id": 5, "title": "Burger", "image": "vbof.png" },
-        { "id": 6, "title": "Fries", "image": "vbof.png" }
+        { "id": 4, "title": "Pizza", "image": "pizza.jpg" },
+        { "id": 5, "title": "Burger", "image": "burger.jpg" },
+        { "id": 6, "title": "Fries", "image": "fries.jpg" }
       ]
     },
     "user3": {
       "name": "Alice Johnson",
       "classroom": "103",
       "inventory": [
-        { "id": 7, "title": "Pasta", "image": "vbof.png" },
-        { "id": 8, "title": "Salad", "image": "vbof.png" },
-        { "id": 9, "title": "Soup", "image": "vbof.png" }
+        { "id": 7, "title": "Pasta", "image": "pasta.jpg" },
+        { "id": 8, "title": "Salad", "image": "salad.jpg" },
+        { "id": 9, "title": "Soup", "image": "soup.jpg" }
       ]
     },
     "user4": {
       "name": "Bob Brown",
       "classroom": "104",
       "inventory": [
-        { "id": 10, "title": "Steak", "image": "vbof.png" },
-        { "id": 11, "title": "Chicken", "image": "vbof.png" },
-        { "id": 12, "title": "Fish", "image": "vbof.png" }
+        { "id": 10, "title": "Steak", "image": "steak.jpg" },
+        { "id": 11, "title": "Chicken", "image": "chicken.jpg" },
+        { "id": 12, "title": "Fish", "image": "fish.jpg" }
       ]
     },
     "user5": {
       "name": "Charlie Davis",
       "classroom": "105",
       "inventory": [
-        { "id": 13, "title": "Ice Cream", "image": "vbof.png" },
-        { "id": 14, "title": "Cake", "image": "vbof.png" },
+        { "id": 13, "title": "Ice Cream", "image": "icecream.jpeg" },
+        { "id": 14, "title": "Cake", "image": "cake.webp" },
         { "id": 15, "title": "Cookies", "image": "vbof.png" }
       ]
     }
   },
   "foodListings": [
-    { "id": 1, "title": "Apple", "image": "vbof.png", "seller": "user1" },
-    { "id": 2, "title": "Banana", "image": "vbof.png", "seller": "user1" },
-    { "id": 3, "title": "Orange", "image": "vbof.png", "seller": "user1" },
-    { "id": 4, "title": "Pizza", "image": "vbof.png", "seller": "user2" },
-    { "id": 5, "title": "Burger", "image": "vbof.png", "seller": "user2" },
-    { "id": 6, "title": "Fries", "image": "vbof.png", "seller": "user2" },
-    { "id": 7, "title": "Pasta", "image": "vbof.png", "seller": "user3" },
-    { "id": 8, "title": "Salad", "image": "vbof.png", "seller": "user3" },
-    { "id": 9, "title": "Soup", "image": "vbof.png", "seller": "user3" },
-    { "id": 10, "title": "Steak", "image": "vbof.png", "seller": "user4" },
-    { "id": 11, "title": "Chicken", "image": "vbof.png", "seller": "user4" },
-    { "id": 12, "title": "Fish", "image": "vbof.png", "seller": "user4" },
-    { "id": 13, "title": "Ice Cream", "image": "vbof.png", "seller": "user5" },
-    { "id": 14, "title": "Cake", "image": "vbof.png", "seller": "user5" },
-    { "id": 15, "title": "Cookies", "image": "vbof.png", "seller": "user5" }
+    { "id": 1, "title": "Apple", "image": "apple.jpg", "seller": "user1" },
+    { "id": 2, "title": "Banana", "image": "banana.avif", "seller": "user1" },
+    { "id": 3, "title": "Orange", "image": "orange.jpg", "seller": "user1" },
+    { "id": 4, "title": "Pizza", "image": "pizza.jpg", "seller": "user2" },
+    { "id": 5, "title": "Burger", "image": "burger.jpg", "seller": "user2" },
+    { "id": 6, "title": "Fries", "image": "fries.jpg", "seller": "user2" },
+    { "id": 7, "title": "Pasta", "image": "pasta.jpg", "seller": "user3" },
+    { "id": 8, "title": "Salad", "image": "salad.jpg", "seller": "user3" },
+    { "id": 9, "title": "Soup", "image": "soup.jpg", "seller": "user3" },
+    { "id": 10, "title": "Steak", "image": "steak.jpg", "seller": "user4" },
+    { "id": 11, "title": "Chicken", "image": "chicken.jpg", "seller": "user4" },
+    { "id": 12, "title": "Fish", "image": "fish.jpg", "seller": "user4" },
+    { "id": 13, "title": "Ice Cream", "image": "icecream.jpeg", "seller": "user5" },
+    { "id": 14, "title": "Cake", "image": "cake.webp", "seller": "user5" },
+    { "id": 15, "title": "Cookies", "image": "cookie.jpg", "seller": "user5" }
   ]
 }

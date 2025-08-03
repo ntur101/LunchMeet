@@ -1,10 +1,10 @@
 import { Button } from "/components/ui/button"
 import { Link } from "react-router-dom"
 
-export function FoodCard({ imageSrc, label, to = "#", onClick }) {
+export function FoodCard({ imageSrc, label, id, onClick }) {
   return (
     <Button asChild variant="ghost" className="p-0 rounded-xl overflow-hidden bg-[#C5BAFF] h-34 w-42 flex-shrink-0 shadow">
-      <Link to={to} onClick={onClick} className="flex flex-col items-center">
+      <Link to={`/food/${id}`} onClick={onClick} className="flex flex-col items-center">
         <img
           src={imageSrc}
           alt={label}
