@@ -4,13 +4,17 @@ import { CircleUserRound, House, MessageCircle, Search } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNotification } from "../../src/contexts/NotificationContext";
 
 
 export function HeaderBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { hasNewMessage } = useNotification();
   const isHome = location.pathname === "/";
   const [searchTerm, setSearchTerm] = useState("");
+
+  console.log('HeaderBar hasNewMessage:', hasNewMessage);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -57,8 +61,13 @@ export function HeaderBar() {
 
       {/* Right icon */}
       <Link to="/chats">
-        <div className="rounded-xl p-2 hover:bg-white transition">
+        <div className="rounded-xl p-2 hover:bg-white transition relative">
           <MessageCircle className="h-7 w-7 text-white" />
+          {hasNewMessage && (
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              1
+            </div>
+          )}
         </div>
       </Link>
     </div>
