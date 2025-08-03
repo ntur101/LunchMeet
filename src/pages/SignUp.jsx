@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useUser } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import { Input } from "/components/ui/input"
 import { Button } from "/components/ui/button"
@@ -24,6 +25,11 @@ function SignUp() {
         navigate("/"); // redirect to homepage or dashboard
     };
 
+    const { setUsername } = useUser();
+    const handleInputChange = (e) => {
+        setUsername(e.target.value);
+    };
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 space-y-6">
             {/* Logo */}
@@ -44,7 +50,13 @@ function SignUp() {
             {/* Username Input */}
             <div>
                 <Label htmlFor="username" className="text-base">Username</Label>
-                <Input id="username" type="text" placeholder="Enter your username" className="text-sm"/>
+                <Input 
+                    id="username" 
+                    type="text" 
+                    placeholder="Enter your username" 
+                    className="text-sm"
+                    onChange={handleInputChange}
+                />
             </div>
 
             {/* Email Input */}

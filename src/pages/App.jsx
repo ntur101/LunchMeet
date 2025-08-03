@@ -8,6 +8,7 @@ import FoodDetail from './FoodDetail';
 import Chat from './Chat';
 import ChatList from './ChatList';
 import { HeaderBar } from '/components/ui/header-bar';
+import { UserProvider } from './UserContext';
 
 function AppContent() {
   const location = useLocation();
@@ -34,9 +35,11 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <UserProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </UserProvider>
   );
 }
 
