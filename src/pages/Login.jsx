@@ -54,7 +54,7 @@ function Login() {
 
         {/* Confirm Button */}
         <Link to="/">
-          <Button className="w-full bg-[#C5BAFF] text-black hover:text-white">Confirm</Button>
+          <Button className="w-full bg-[#C5BAFF] text-black hover:text-white">Sign In</Button>
         </Link>
       </div>
 
@@ -67,7 +67,9 @@ function Login() {
 
       {/* Sign Up Button */}
       <div className="w-full max-w-sm my-6">
-        <Button className="w-full bg-[#C5BAFF] text-black hover:text-white">Sign Up</Button>
+        <Link to="/signup">
+          <Button className="w-full bg-[#C5BAFF] text-black hover:text-white">Sign Up</Button>
+        </Link>
       </div>
 
     </div>
