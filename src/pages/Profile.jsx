@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useUser } from "./UserContext";
 import { Button } from "/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
 import { Pencil, Trash, AlertTriangle } from "lucide-react";
@@ -10,6 +11,7 @@ function Profile() {
   const [inventory, setInventory] = useState([]);
   const [showClearDialog, setShowClearDialog] = useState(false);
   const processedImages = useRef(new Set());
+  const { username } = useUser();
 
   // Load inventory from localStorage
   useEffect(() => {
@@ -114,7 +116,7 @@ function Profile() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Profile</h1>
-            <p className="text-lg">Name: John Doe</p>
+            <p className="text-lg">Name: {username || "John Doe"}</p>
           </div>
           
           {/* Clear All Button */}
