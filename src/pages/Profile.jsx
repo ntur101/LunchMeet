@@ -145,7 +145,7 @@ function Profile() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {inventory.map((item) => (
-              <Card key={item.id} className="w-full max-w-sm shadow-md">
+              <Card key={item.id} className="w-full max-w-sm bg-[#C5BAFF] shadow-md">
                 <CardHeader className="relative p-0">
                   <div className="relative w-full aspect-[7/4]">
                     <img
@@ -170,7 +170,7 @@ function Profile() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardTitle className="text-lg font-semibold mt-2 text-center">
+                  <CardTitle className="bg-[#C5BAFF] text-lg font-semibold mt-2 text-center">
                     {item.title}
                   </CardTitle>
                 </CardContent>

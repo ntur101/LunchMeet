@@ -12,6 +12,7 @@ import { UserProvider } from './UserContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { AuthProvider } from '../contexts/AuthContext';
 
+
 function AppContent() {
   const location = useLocation();
   const excludedHeaderPaths = ['/login', '/signup'];
