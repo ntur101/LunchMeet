@@ -56,7 +56,7 @@
   "foodListings": [
     { "id": 1, "title": "Apple", "image": "apple.jpg", "seller": "user1" },
     { "id": 2, "title": "Banana", "image": "banana.avif", "seller": "user1" },
-    { "id": 3, "title": "Orange", "image": "orange.jpg", "seller": "user1" },
+    { "id": 3, "title": "Mandarin", "image": "orange.jpg", "seller": "user1" },
     { "id": 4, "title": "Pizza", "image": "pizza.jpg", "seller": "user2" },
     { "id": 5, "title": "Burger", "image": "burger.jpg", "seller": "user2" },
     { "id": 6, "title": "Fries", "image": "fries.jpg", "seller": "user2" },
