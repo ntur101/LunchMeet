@@ -42,12 +42,12 @@ function AddFood() {
 
   // Effect to connect stream to video element
   useEffect(() => {
-    if (stream && videoRef.current && !isRestartingCamera && !showSavedConfirmation) {
+    if (stream && videoRef.current && !isRestartingCamera && !showSavedConfirmation && !capturedImage) {
       console.log('Connecting stream to video element');
       videoRef.current.srcObject = stream;
       videoRef.current.play().catch(console.error);
     }
-  }, [stream, isRestartingCamera, showSavedConfirmation]);
+  }, [stream, isRestartingCamera, showSavedConfirmation, capturedImage]);
 
   // Debug logging
   useEffect(() => {
@@ -135,10 +135,19 @@ function AddFood() {
     }
   };
 
-  const retakePhoto = () => {
+  const retakePhoto = async () => {
     if (capturedImage) {
       URL.revokeObjectURL(capturedImage.url);
       setCapturedImage(null);
+    }
+    
+    // Add a small delay to ensure the component re-renders
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Ensure video element reconnects to the stream
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
+      await videoRef.current.play().catch(console.error);
     }
   };
 
