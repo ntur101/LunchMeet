@@ -107,7 +107,7 @@ function FoodDetail() {
         <div className="flex justify-center">
           <button 
             onClick={handleTradeClick}
-            className="bg-gray-400 text-white px-16 py-4 rounded-full text-xl font-semibold hover:bg-gray-500 transition-colors"
+            className="bg-[#C5BAFF] text-white px-16 py-4 rounded-full text-xl font-semibold hover:bg-gray-500 transition-colors"
           >
             Trade
           </button>
@@ -117,7 +117,7 @@ function FoodDetail() {
       {/* Trade Modal Popup */}
       {showTradeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-purple-600 rounded-2xl p-6 w-80 mx-4 shadow-2xl">
+          <div className="bg-[#C5BAFF] rounded-2xl p-6 w-80 mx-4 shadow-2xl">
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-6 text-white">Select What To Trade</h3>
               
