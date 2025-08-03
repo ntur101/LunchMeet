@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { listenToChatMetadata, listenToReadStatus, formatTimestamp } from "../lib/chatUtils";
 
 const chatConfigs = [
-  { chatId: "sarah-m", name: "Sarah M." },
+  { chatId: "kieran-m", name: "Kieran M." },
   { chatId: "mike-chen", name: "Mike Chen" },
   { chatId: "jessica-l", name: "Jessica L." },
   { chatId: "alex-k", name: "Alex K." },

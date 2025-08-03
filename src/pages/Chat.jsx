@@ -30,7 +30,7 @@ function Chat() {
 
   // Map chatId to display names
   const chatNames = {
-    "sarah-m": "Sarah M.",
+    "kieran-m": "Kieran M.",
     "mike-chen": "Mike Chen", 
     "jessica-l": "Jessica L.",
     "alex-k": "Alex K."

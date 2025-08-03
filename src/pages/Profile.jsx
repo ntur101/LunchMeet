@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from "./UserContext";
 import { Button } from "/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card";
-import { Pencil, Trash, AlertTriangle } from "lucide-react";
+import { Pencil, Trash, AlertTriangle, Camera, Plus } from "lucide-react";
 import { EditDialog, DeleteDialog } from "../components/EditDeleteDialogs";
 
 function Profile() {
@@ -12,6 +13,7 @@ function Profile() {
   const [showClearDialog, setShowClearDialog] = useState(false);
   const processedImages = useRef(new Set());
   const { username } = useUser();
+  const navigate = useNavigate();
 
   // Load inventory from localStorage
   useEffect(() => {
@@ -135,12 +137,32 @@ function Profile() {
 
       {/* Inventory Section */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-4">Current Inventory</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Current Inventory</h2>
+          
+          {/* Add Food Button */}
+          <Button 
+            onClick={() => navigate('/add')}
+            className="bg-[#C5BAFF] hover:bg-[#B8ACFF] text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+          >
+            <Camera className="w-4 h-4" />
+            Add Food
+          </Button>
+        </div>
         
         {inventory.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-12 text-gray-500">
+            <Camera className="w-16 h-16 mx-auto mb-4 text-gray-300" />
             <p className="text-lg mb-2">No items in your inventory yet</p>
-            <p className="text-sm">Take some photos using the camera to get started!</p>
+            <p className="text-sm mb-6">Take some photos using the camera to get started!</p>
+            
+            <Button 
+              onClick={() => navigate('/add')}
+              className="bg-[#C5BAFF] hover:bg-[#B8ACFF] text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-2 mx-auto"
+            >
+              <Camera className="w-5 h-5" />
+              Take Your First Photo
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
