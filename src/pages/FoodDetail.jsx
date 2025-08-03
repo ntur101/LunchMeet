@@ -80,9 +80,7 @@ function FoodDetail() {
     alert(`Trade offer sent with ${selectedItems.length} item(s)!`);
     setShowTradeModal(false);
     setSelectedItems([]);
-    // Trigger notification and redirect to home page
-    console.log('Triggering new message notification...');
-    triggerNewMessage();
+    // Redirect to home page
     navigate('/');
   };
 
