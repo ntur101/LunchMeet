@@ -1,4 +1,6 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { listenToReadStatus } from '../lib/chatUtils';
 
 const NotificationContext = createContext();
 
@@ -13,6 +15,34 @@ export const useNotification = () => {
 export const NotificationProvider = ({ children }) => {
   const [hasNewMessage, setHasNewMessage] = useState(false);
   const [newMessageTimeout, setNewMessageTimeout] = useState(null);
+  const [hasAnyUnread, setHasAnyUnread] = useState(false);
+  const { user } = useAuth();
+
+  // Monitor unread status across all chats
+  useEffect(() => {
+    if (!user) return;
+
+    const chatIds = ["sarah-m", "mike-chen", "jessica-l", "alex-k"];
+    const unreadStatuses = {};
+    const unsubscribeFunctions = [];
+
+    const updateGlobalUnreadStatus = () => {
+      const hasUnread = Object.values(unreadStatuses).some(status => status);
+      setHasAnyUnread(hasUnread);
+    };
+
+    chatIds.forEach(chatId => {
+      const unsubscribe = listenToReadStatus(chatId, user.uid, (hasUnread) => {
+        unreadStatuses[chatId] = hasUnread;
+        updateGlobalUnreadStatus();
+      });
+      unsubscribeFunctions.push(unsubscribe);
+    });
+
+    return () => {
+      unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    };
+  }, [user]);
 
   const triggerNewMessage = () => {
     console.log('triggerNewMessage called');
@@ -38,10 +68,14 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Use Firebase unread status or fallback to old system
+  const shouldShowNotification = hasAnyUnread || hasNewMessage;
+
   return (
     <NotificationContext.Provider 
       value={{ 
-        hasNewMessage, 
+        hasNewMessage: shouldShowNotification,
+        hasAnyUnread,
         triggerNewMessage, 
         clearNewMessage 
       }}

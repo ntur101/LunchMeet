@@ -2,21 +2,32 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
-import { X } from 'lucide-react';
+import { X, Send } from 'lucide-react';
 import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
+import { sendMessage, listenToMessages, formatTimestamp, markChatAsRead } from '../lib/chatUtils';
 
 function Chat() {
   const { chatId } = useParams();
   const navigate = useNavigate();
   const { clearNewMessage } = useNotification();
+  const { user } = useAuth();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const messagesEndRef = useRef(null);
   
-  // Clear notification when entering Sarah's chat
+  // Clear notification when entering any chat and mark as read
   useEffect(() => {
-    if (chatId === "sarah-m") {
-      clearNewMessage();
+    clearNewMessage(); // Clear any old-style notifications
+    
+    // Mark chat as read when user opens it
+    if (user && chatId) {
+      markChatAsRead(chatId, user.uid);
     }
-  }, [chatId, clearNewMessage]);
-  
+  }, [chatId, clearNewMessage, user]);
+
   // Map chatId to display names
   const chatNames = {
     "sarah-m": "Sarah M.",
@@ -26,92 +37,62 @@ function Chat() {
   };
   
   const displayName = chatNames[chatId] || chatId;
-  
-  // Different message sets based on chatId
-  const getInitialMessages = (chatId) => {
-    if (chatId === "sarah-m") {
-      return [
-        { id: 1, text: "I've accepted your trade offer!", sender: "other", timestamp: "10:30 AM" },
-      ];
-    }
-    // Default messages for other chats
-    return [
-      { id: 1, text: "Hey! Is this item still available?", sender: "other", timestamp: "10:30 AM" },
-      { id: 2, text: "Yes it is! Made it fresh this morning 😊", sender: "me", timestamp: "10:32 AM" },
-      { id: 3, text: "Perfect! Can we meet up around noon?", sender: "other", timestamp: "10:35 AM" },
-      { id: 4, text: "Sure! How about the student center food court?", sender: "me", timestamp: "10:37 AM" },
-      { id: 5, text: "Sounds good! See you there", sender: "other", timestamp: "10:40 AM" },
-    ];
-  };
-  
-  const [messages, setMessages] = useState(getInitialMessages(chatId));
-  const [newMessage, setNewMessage] = useState("");
-  const [responseIndex, setResponseIndex] = useState(0); // Track which response to use next
-  const [isTyping, setIsTyping] = useState(false); // Track if Sarah is typing
-  const [isVisible, setIsVisible] = useState(false); // For slide animation
-  const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Trigger slide-up animation when component mounts
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    // Trigger slide-up animation when component mounts
     setIsVisible(true);
   }, []);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      const message = {
-        id: messages.length + 1,
-        text: newMessage,
-        sender: "me",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prev => [...prev, message]);
-      setNewMessage("");
+  // Listen to messages from Firebase
+  useEffect(() => {
+    if (!chatId) return;
+    
+    setIsLoading(true);
+    const unsubscribe = listenToMessages(chatId, (firebaseMessages) => {
+      setMessages(firebaseMessages);
+      setIsLoading(false);
       
-      // Auto-response for Sarah's chat after 3 seconds
-      if (chatId === "sarah-m") {
-        // Wait 1.5 seconds before showing typing indicator
-        setTimeout(() => {
-          setIsTyping(true); // Show typing indicator
-        }, 1500);
-        
-        setTimeout(() => {
-          const responses = [
-            "lets meet outside the library does 9:30 work?",
-            "Awesome, see you then",
-            "Sounds good to me!",
-            "Thanks! You're the best 🙌"
-          ];
-          
-          // Use sequential responses instead of random
-          const response = responses[responseIndex % responses.length];
-          setResponseIndex(prev => prev + 1);
-          
-          const autoMessage = {
-            id: Date.now(), // Use timestamp for unique ID
-            text: response,
-            sender: "other",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-          setMessages(prev => [...prev, autoMessage]);
-          setIsTyping(false); // Hide typing indicator
-        }, 5000);
+      // Mark as read when new messages come in (if user is viewing this chat)
+      if (user && firebaseMessages.length > 0) {
+        markChatAsRead(chatId, user.uid);
       }
+    });
+
+    return unsubscribe;
+  }, [chatId, user]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Send message
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user) return;
+
+    try {
+      await sendMessage(chatId, newMessage.trim(), user.uid, user.displayName);
+      setNewMessage("");
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-500">Loading chat...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex flex-col h-screen transform transition-transform duration-300 ease-out ${
@@ -132,62 +113,57 @@ function Chat() {
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`mb-4 flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                message.sender === 'me'
-                  ? 'bg-blue-500 text-white rounded-br-none'
-                  : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
-              }`}
-            >
-              <p className="text-sm">{message.text}</p>
-              <p className={`text-xs mt-1 ${
-                message.sender === 'me' ? 'text-blue-100' : 'text-gray-500'
-              }`}>
-                {message.timestamp}
-              </p>
-            </div>
+        {messages.length === 0 ? (
+          <div className="text-center text-gray-500 mt-8">
+            <p>No messages yet. Start the conversation!</p>
           </div>
-        ))}
-        
-        {/* Typing indicator */}
-        {isTyping && (
-          <div className="mb-4 flex justify-start">
-            <div className="max-w-xs lg:max-w-md px-4 py-2 rounded-lg bg-white text-gray-800 rounded-bl-none shadow-sm">
-              <div className="flex items-center space-x-2 pl-2">
-                <span className="text-sm text-gray-500">{displayName} is typing</span>
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDuration: '0.6s', transform: 'translateY(-4px)'}}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s', animationDuration: '0.6s', transform: 'translateY(-4px)'}}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.4s', animationDuration: '0.6s', transform: 'translateY(-4px)'}}></div>
-                </div>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`mb-4 flex ${message.senderId === user?.uid ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  message.senderId === user?.uid
+                    ? 'bg-blue-500 text-white rounded-br-none'
+                    : 'bg-white text-gray-800 rounded-bl-none shadow-sm'
+                }`}
+              >
+                <p className="text-sm">{message.text}</p>
+                <p className={`text-xs mt-1 ${
+                  message.senderId === user?.uid ? 'text-blue-100' : 'text-gray-500'
+                }`}>
+                  {formatTimestamp(message.createdAt || message.timestamp)}
+                </p>
               </div>
             </div>
-          </div>
+          ))
         )}
-        
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
+      {/* Message Input */}
       <div className="bg-white border-t p-4">
-        <div className="flex space-x-2">
+        <form onSubmit={handleSendMessage} className="flex space-x-2">
           <Input
             type="text"
-            placeholder="Type a message..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
+            placeholder="Type a message..."
             className="flex-1"
+            disabled={!user}
           />
-          <Button onClick={handleSendMessage} className="px-6">
-            Send
+          <Button 
+            type="submit" 
+            size="sm"
+            disabled={!newMessage.trim() || !user}
+            className="px-3"
+          >
+            <Send className="h-4 w-4" />
           </Button>
-        </div>
+        </form>
       </div>
     </div>
   );

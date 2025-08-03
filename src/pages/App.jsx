@@ -10,6 +10,8 @@ import ChatList from './ChatList';
 import { HeaderBar } from '/components/ui/header-bar';
 import { UserProvider } from './UserContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import { AuthProvider } from '../contexts/AuthContext';
+
 
 function AppContent() {
   const location = useLocation();
@@ -36,13 +38,15 @@ function AppContent() {
 
 function App() {
   return (
-    <UserProvider>
-      <NotificationProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </NotificationProvider>
-    </UserProvider>
+    <AuthProvider>
+      <UserProvider>
+        <NotificationProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </NotificationProvider>
+      </UserProvider>
+    </AuthProvider>
   );
 }
 

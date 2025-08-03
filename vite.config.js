@@ -15,5 +15,9 @@ export default defineConfig({
     "paths": {
       "@/*": ["./*"]
     }
+  },
+  server: {
+    host: true, // expose on local network
+    port: 5173
   }
-})
+});
